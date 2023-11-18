@@ -1,4 +1,4 @@
-//! Wait for multiple futures to complete.
+//! 等待多个future完成。
 
 use core::future::Future;
 use core::mem::MaybeUninit;
@@ -8,12 +8,13 @@ use core::{fmt, mem};
 
 #[derive(Debug)]
 enum MaybeDone<Fut: Future> {
-    /// A not-yet-completed future
+    /// 一个尚未完成的future
     Future(/* #[pin] */ Fut),
-    /// The output of the completed future
+    /// 一个已完成的future的输出
     Done(Fut::Output),
-    /// The empty variant after the result of a [`MaybeDone`] has been
-    /// taken using the [`take_output`](MaybeDone::take_output) method.
+    /// 当使用[MaybeDone]的take_output方法取出结果后，MaybeDone将变为空状态。
+    /// 也就是说，一旦我们从MaybeDone中取出了结果，它就会变成Gone状态，表示没有任何内容了。
+    /// 如果再次尝试从这个MaybeDone中取出结果，将会引发panic。这是一种防止重复使用结果的机制。
     Gone,
 }
 
@@ -119,15 +120,14 @@ generate! {
     (Join5, <Fut1, Fut2, Fut3, Fut4, Fut5>),
 }
 
-/// Joins the result of two futures, waiting for them both to complete.
+/// 合并两个future的结果，等待他们都完成
 ///
-/// This function will return a new future which awaits both futures to
-/// complete. The returned future will finish with a tuple of both results.
+/// 本函数将以await的方式等待两个future都完成，并返回一个新的future
+/// 返回的future会以两个future的结果所组成的元组的方式进行输出。
 ///
-/// Note that this function consumes the passed futures and returns a
-/// wrapped version of it.
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
 ///
-/// # Examples
+/// # 例子
 ///
 /// ```
 /// # embassy_futures::block_on(async {
@@ -147,15 +147,15 @@ where
     Join::new(future1, future2)
 }
 
-/// Joins the result of three futures, waiting for them all to complete.
+
+/// 合并三个future的结果，等待他们都完成
 ///
-/// This function will return a new future which awaits all futures to
-/// complete. The returned future will finish with a tuple of all results.
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
 ///
-/// Note that this function consumes the passed futures and returns a
-/// wrapped version of it.
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
 ///
-/// # Examples
+/// # 例子
 ///
 /// ```
 /// # embassy_futures::block_on(async {
@@ -177,15 +177,14 @@ where
     Join3::new(future1, future2, future3)
 }
 
-/// Joins the result of four futures, waiting for them all to complete.
+
+/// 合并四个future的结果，等待他们都完成
 ///
-/// This function will return a new future which awaits all futures to
-/// complete. The returned future will finish with a tuple of all results.
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
 ///
-/// Note that this function consumes the passed futures and returns a
-/// wrapped version of it.
-///
-/// # Examples
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+/// # 例子
 ///
 /// ```
 /// # embassy_futures::block_on(async {
@@ -214,15 +213,14 @@ where
     Join4::new(future1, future2, future3, future4)
 }
 
-/// Joins the result of five futures, waiting for them all to complete.
+/// 合并四个future的结果，等待他们都完成
 ///
-/// This function will return a new future which awaits all futures to
-/// complete. The returned future will finish with a tuple of all results.
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
 ///
-/// Note that this function consumes the passed futures and returns a
-/// wrapped version of it.
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
 ///
-/// # Examples
+/// # 例子
 ///
 /// ```
 /// # embassy_futures::block_on(async {
@@ -293,13 +291,13 @@ impl<Fut: Future, const N: usize> Future for JoinArray<Fut, N> {
     }
 }
 
-/// Joins the result of an array of futures, waiting for them all to complete.
+
+/// 合并一个future数组中所有future的结果，等待他们都完成
 ///
-/// This function will return a new future which awaits all futures to
-/// complete. The returned future will finish with a tuple of all results.
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
 ///
-/// Note that this function consumes the passed futures and returns a
-/// wrapped version of it.
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
 ///
 /// # Examples
 ///
