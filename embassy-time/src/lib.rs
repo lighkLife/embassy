@@ -34,6 +34,15 @@ pub use duration::Duration;
 pub use instant::Instant;
 pub use timer::{with_timeout, Ticker, TimeoutError, Timer};
 
+/// ## 中文(Chinese)
+/// 全局时间基线中的时间刻度(Ticks)，单位是Ticks/秒
+///
+/// 时间刻度在 `tick-*` 开头的 Cargo features中定义, 在
+/// 时间驱动中设置。一些驱动仅支持固定的频率, 另一些允许
+/// 通过Cargo features单独设置。作为最终用户，在embassy中并
+/// 不能设置`tick-*` features。
+
+/// ## English
 /// Ticks per second of the global timebase.
 ///
 /// This value is specified by the `tick-*` Cargo features, which
