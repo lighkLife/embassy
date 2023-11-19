@@ -6,6 +6,7 @@ members = [
     "embassy-time",
     "embassy-futures",
     "embassy-sync",
+    "embassy-macros"
 ]
 
 [profile.release]
