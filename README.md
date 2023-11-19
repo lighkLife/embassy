@@ -11,16 +11,16 @@
 2. 新增的中文注释结构和格式需要与原文保持一致；
 
 
-| crate | 文件 | 翻译作者 | 状态  | 修订  |
-| --- | --- | --- | --- ||--- |
-| embassy-executor| | [LighkLife](https://github.com/lighkLife) | 进行中 |
-| embassy-futures  |  |     |     |
-| embassy-time | | [ziyouwa](https://github.com/ziyouwa) | 进行中 |
-|     |     |     |
-|     |     |     |
-|     |     |     |
-|     |     |     |
-|     |     |     |
-|     |     |     |
-|     |     |     |
-|     |     |     |
+| crate            | file | Translation author                        | status      | reviser |
+|------------------|------|-------------------------------------------|:------------|---------|
+| embassy-executor |      | [LighkLife](https://github.com/lighkLife) | in progress |         |
+| embassy-futures  |      |                                           |             |         |
+| embassy-time     |      | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
+|                  |      |                                           |             |         |
