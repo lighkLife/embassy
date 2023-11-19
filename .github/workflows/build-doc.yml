@@ -16,7 +16,9 @@ jobs:
         run: |
           cargo doc --features arch-std,executor-thread,std,nightly,turbowakers 
       - name: copy html
-        run: touch target/doc/.nojekyll
+        run: |
+          touch target/doc/.nojekyll
+          cp index.html target/doc/index.html
 
       - name: Push to gh-pages
         uses: peaceiris/actions-gh-pages@v3
