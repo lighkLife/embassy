@@ -1,6 +1,8 @@
 # Embassy 代码注释版
 > 源仓库：https://github.com/embassy-rs/embassy
 
+**[在线文档](https://lighklife.github.io/embassy/)**
+
 ## 参与翻译的步骤
 1. fork 此仓库到自己的 Github；
 2. 修改项目根目录下的 `readme.md`, 填写自己计划翻译的 crate 以及文件，然后提交 Pull requests 到本仓库（让他同学知晓你已经在翻译这部分内容）；
@@ -13,16 +15,17 @@
 
 ## 翻译登记
 
-| Crate            | File | Translation author                        | Status      | Reviser |
-|------------------|------|-------------------------------------------|:------------|---------|
-| embassy-executor |      | [LighkLife](https://github.com/lighkLife) | in progress |         |
-| embassy-futures  |      |                                           |             |         |
-| embassy-time     |      | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
-|                  |      |                                           |             |         |
+| Crate            | File          | Translation author                        | Status      | Reviser |
+|------------------|---------------|-------------------------------------------|:------------|---------|
+| embassy-executor | `arch/std.rs` | [LighkLife](https://github.com/lighkLife) | in progress |         |
+| embassy-futures  |               |                                           |             |         |
+| embassy-time     |               | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+|                  |               |                                           |             |         |
+
