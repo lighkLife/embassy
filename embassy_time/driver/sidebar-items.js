@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["allocate_alarm","now","set_alarm","set_alarm_callback"],"struct":["AlarmHandle"],"trait":["Driver"]};
