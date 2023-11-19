@@ -11,7 +11,7 @@
 2. 新增的中文注释结构和格式需要与原文保持一致；
 
 
-| crate            | file | Translation author                        | status      | reviser |
+| Crate            | File | Translation author                        | Status      | Reviser |
 |------------------|------|-------------------------------------------|:------------|---------|
 | embassy-executor |      | [LighkLife](https://github.com/lighkLife) | in progress |         |
 | embassy-futures  |      |                                           |             |         |
