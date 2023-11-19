@@ -14,7 +14,7 @@ jobs:
           submodules: "true"
       - name: build doc
         run: |
-          cargo doc --features arch-std,executor-thread,std,nightly,turbowakers 
+          cargo doc --features arch-std,executor-thread,std,nightly,turbowakers   --no-deps
       - name: copy html
         run: |
           touch target/doc/.nojekyll
