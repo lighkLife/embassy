@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `embassy-sync/src/channel.rs`."><title>channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="embassy_sync" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (9d83ac217 2023-10-31)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `embassy-sync/src/priority_channel.rs`."><title>priority_channel.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="embassy_sync" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (9d83ac217 2023-10-31)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -611,341 +611,183 @@
 <a href="#611" id="611">611</a>
 <a href="#612" id="612">612</a>
 <a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
-<a href="#641" id="641">641</a>
-<a href="#642" id="642">642</a>
-<a href="#643" id="643">643</a>
-<a href="#644" id="644">644</a>
-<a href="#645" id="645">645</a>
-<a href="#646" id="646">646</a>
-<a href="#647" id="647">647</a>
-<a href="#648" id="648">648</a>
-<a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
-<a href="#656" id="656">656</a>
-<a href="#657" id="657">657</a>
-<a href="#658" id="658">658</a>
-<a href="#659" id="659">659</a>
-<a href="#660" id="660">660</a>
-<a href="#661" id="661">661</a>
-<a href="#662" id="662">662</a>
-<a href="#663" id="663">663</a>
-<a href="#664" id="664">664</a>
-<a href="#665" id="665">665</a>
-<a href="#666" id="666">666</a>
-<a href="#667" id="667">667</a>
-<a href="#668" id="668">668</a>
-<a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
-<a href="#683" id="683">683</a>
-<a href="#684" id="684">684</a>
-<a href="#685" id="685">685</a>
-<a href="#686" id="686">686</a>
-<a href="#687" id="687">687</a>
-<a href="#688" id="688">688</a>
-<a href="#689" id="689">689</a>
-<a href="#690" id="690">690</a>
-<a href="#691" id="691">691</a>
-<a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A queue for sending values between asynchronous tasks.
 //!
-//! It can be used concurrently by multiple producers (senders) and multiple
-//! consumers (receivers), i.e. it is an  &quot;MPMC channel&quot;.
-//!
-//! Receivers are competing for messages. So a message that is received by
-//! one receiver is not received by any other.
-//!
-//! This queue takes a Mutex type so that various
-//! targets can be attained. For example, a ThreadModeMutex can be used
-//! for single-core Cortex-M targets where messages are only passed
-//! between tasks running in thread mode. Similarly, a CriticalSectionMutex
-//! can also be used for single-core targets where messages are to be
-//! passed from exception mode e.g. out of an interrupt handler.
-//!
-//! This module provides a bounded channel that has a limit on the number of
-//! messages that it can store, and if this limit is reached, trying to send
-//! another message will result in an error being returned.
-//!
+//! Similar to a [`Channel`](crate::channel::Channel), however [`PriorityChannel`] sifts higher priority items to the front of the queue.
+//! Priority is determined by the `Ord` trait. Priority behavior is determined by the [`Kind`](heapless::binary_heap::Kind) parameter of the channel.
 
 </span><span class="kw">use </span>core::cell::RefCell;
 <span class="kw">use </span>core::future::Future;
 <span class="kw">use </span>core::pin::Pin;
 <span class="kw">use </span>core::task::{Context, Poll};
 
-<span class="kw">use </span>heapless::Deque;
+<span class="kw">pub use </span>heapless::binary_heap::{Kind, Max, Min};
+<span class="kw">use </span>heapless::BinaryHeap;
 
 <span class="kw">use </span><span class="kw">crate</span>::blocking_mutex::raw::RawMutex;
 <span class="kw">use </span><span class="kw">crate</span>::blocking_mutex::Mutex;
+<span class="kw">use </span><span class="kw">crate</span>::channel::{DynamicChannel, DynamicReceiver, DynamicSender, TryReceiveError, TrySendError};
 <span class="kw">use </span><span class="kw">crate</span>::waitqueue::WakerRegistration;
 
-<span class="doccomment">/// Send-only access to a [`Channel`].
-</span><span class="kw">pub struct </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt;
+<span class="doccomment">/// Send-only access to a [`PriorityChannel`].
+</span><span class="kw">pub struct </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>Channel&lt;M, T, N&gt;,
+    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>PriorityChannel&lt;M, T, K, N&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Clone <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Clone <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         Sender { channel: <span class="self">self</span>.channel }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Copy <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt; <span class="kw">where </span>M: RawMutex {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Copy <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
+{
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
+<span class="kw">where
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="doccomment">/// Sends a value.
     ///
-    /// See [`Channel::send()`]
-    </span><span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt; {
+    /// See [`PriorityChannel::send()`]
+    </span><span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt; {
         <span class="self">self</span>.channel.send(message)
     }
 
     <span class="doccomment">/// Attempt to immediately send a message.
     ///
-    /// See [`Channel::send()`]
+    /// See [`PriorityChannel::send()`]
     </span><span class="kw">pub fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
         <span class="self">self</span>.channel.try_send(message)
     }
 
     <span class="doccomment">/// Allows a poll_fn to poll until the channel is ready to send
     ///
-    /// See [`Channel::poll_ready_to_send()`]
+    /// See [`PriorityChannel::poll_ready_to_send()`]
     </span><span class="kw">pub fn </span>poll_ready_to_send(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
         <span class="self">self</span>.channel.poll_ready_to_send(cx)
     }
 }
 
-<span class="doccomment">/// Send-only access to a [`Channel`] without knowing channel size.
-</span><span class="kw">pub struct </span>DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span><span class="kw">dyn </span>DynamicChannel&lt;T&gt;,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Clone <span class="kw">for </span>DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        DynamicSender { channel: <span class="self">self</span>.channel }
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Copy <span class="kw">for </span>DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt; {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; From&lt;Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;&gt; <span class="kw">for </span>DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; From&lt;Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;&gt; <span class="kw">for </span>DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    <span class="kw">fn </span>from(s: Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>from(s: Sender&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ channel: s.channel }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; DynamicSender&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="doccomment">/// Sends a value.
-    ///
-    /// See [`Channel::send()`]
-    </span><span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; DynamicSendFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-        DynamicSendFuture {
-            channel: <span class="self">self</span>.channel,
-            message: <span class="prelude-val">Some</span>(message),
-        }
-    }
-
-    <span class="doccomment">/// Attempt to immediately send a message.
-    ///
-    /// See [`Channel::send()`]
-    </span><span class="kw">pub fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
-        <span class="self">self</span>.channel.try_send_with_context(message, <span class="prelude-val">None</span>)
-    }
-
-    <span class="doccomment">/// Allows a poll_fn to poll until the channel is ready to send
-    ///
-    /// See [`Channel::poll_ready_to_send()`]
-    </span><span class="kw">pub fn </span>poll_ready_to_send(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
-        <span class="self">self</span>.channel.poll_ready_to_send(cx)
-    }
-}
-
-<span class="doccomment">/// Receive-only access to a [`Channel`].
-</span><span class="kw">pub struct </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt;
+<span class="doccomment">/// Receive-only access to a [`PriorityChannel`].
+</span><span class="kw">pub struct </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>Channel&lt;M, T, N&gt;,
+    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>PriorityChannel&lt;M, T, K, N&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Clone <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Clone <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         Receiver { channel: <span class="self">self</span>.channel }
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Copy <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt; <span class="kw">where </span>M: RawMutex {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Copy <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
+{
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
+<span class="kw">where
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="doccomment">/// Receive the next value.
     ///
-    /// See [`Channel::receive()`].
-    </span><span class="kw">pub fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReceiveFuture&lt;<span class="lifetime">&#39;_</span>, M, T, N&gt; {
+    /// See [`PriorityChannel::receive()`].
+    </span><span class="kw">pub fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReceiveFuture&lt;<span class="lifetime">&#39;_</span>, M, T, K, N&gt; {
         <span class="self">self</span>.channel.receive()
     }
 
     <span class="doccomment">/// Attempt to immediately receive the next value.
     ///
-    /// See [`Channel::try_receive()`]
+    /// See [`PriorityChannel::try_receive()`]
     </span><span class="kw">pub fn </span>try_receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryReceiveError&gt; {
         <span class="self">self</span>.channel.try_receive()
     }
 
     <span class="doccomment">/// Allows a poll_fn to poll until the channel is ready to receive
     ///
-    /// See [`Channel::poll_ready_to_receive()`]
+    /// See [`PriorityChannel::poll_ready_to_receive()`]
     </span><span class="kw">pub fn </span>poll_ready_to_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
         <span class="self">self</span>.channel.poll_ready_to_receive(cx)
     }
 
     <span class="doccomment">/// Poll the channel for the next item
     ///
-    /// See [`Channel::poll_receive()`]
+    /// See [`PriorityChannel::poll_receive()`]
     </span><span class="kw">pub fn </span>poll_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
         <span class="self">self</span>.channel.poll_receive(cx)
     }
 }
 
-<span class="doccomment">/// Receive-only access to a [`Channel`] without knowing channel size.
-</span><span class="kw">pub struct </span>DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span><span class="kw">dyn </span>DynamicChannel&lt;T&gt;,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Clone <span class="kw">for </span>DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        DynamicReceiver { channel: <span class="self">self</span>.channel }
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Copy <span class="kw">for </span>DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt; {}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="doccomment">/// Receive the next value.
-    ///
-    /// See [`Channel::receive()`].
-    </span><span class="kw">pub fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DynamicReceiveFuture&lt;<span class="lifetime">&#39;_</span>, T&gt; {
-        DynamicReceiveFuture { channel: <span class="self">self</span>.channel }
-    }
-
-    <span class="doccomment">/// Attempt to immediately receive the next value.
-    ///
-    /// See [`Channel::try_receive()`]
-    </span><span class="kw">pub fn </span>try_receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryReceiveError&gt; {
-        <span class="self">self</span>.channel.try_receive_with_context(<span class="prelude-val">None</span>)
-    }
-
-    <span class="doccomment">/// Allows a poll_fn to poll until the channel is ready to receive
-    ///
-    /// See [`Channel::poll_ready_to_receive()`]
-    </span><span class="kw">pub fn </span>poll_ready_to_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
-        <span class="self">self</span>.channel.poll_ready_to_receive(cx)
-    }
-
-    <span class="doccomment">/// Poll the channel for the next item
-    ///
-    /// See [`Channel::poll_receive()`]
-    </span><span class="kw">pub fn </span>poll_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
-        <span class="self">self</span>.channel.poll_receive(cx)
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; From&lt;Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;&gt; <span class="kw">for </span>DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; From&lt;Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;&gt; <span class="kw">for </span>DynamicReceiver&lt;<span class="lifetime">&#39;ch</span>, T&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    <span class="kw">fn </span>from(s: Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;) -&gt; <span class="self">Self </span>{
+    <span class="kw">fn </span>from(s: Receiver&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ channel: s.channel }
     }
 }
 
-<span class="doccomment">/// Future returned by [`Channel::receive`] and  [`Receiver::receive`].
+<span class="doccomment">/// Future returned by [`PriorityChannel::receive`] and  [`Receiver::receive`].
 </span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
-</span><span class="kw">pub struct </span>ReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt;
+</span><span class="kw">pub struct </span>ReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>Channel&lt;M, T, N&gt;,
+    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>PriorityChannel&lt;M, T, K, N&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Future <span class="kw">for </span>ReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Future <span class="kw">for </span>ReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="kw">type </span>Output = T;
 
@@ -954,36 +796,23 @@
     }
 }
 
-<span class="doccomment">/// Future returned by [`DynamicReceiver::receive`].
+<span class="doccomment">/// Future returned by [`PriorityChannel::send`] and  [`Sender::send`].
 </span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
-</span><span class="kw">pub struct </span>DynamicReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span><span class="kw">dyn </span>DynamicChannel&lt;T&gt;,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Future <span class="kw">for </span>DynamicReceiveFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">type </span>Output = T;
-
-    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
-        <span class="kw">match </span><span class="self">self</span>.channel.try_receive_with_context(<span class="prelude-val">Some</span>(cx)) {
-            <span class="prelude-val">Ok</span>(v) =&gt; Poll::Ready(v),
-            <span class="prelude-val">Err</span>(TryReceiveError::Empty) =&gt; Poll::Pending,
-        }
-    }
-}
-
-<span class="doccomment">/// Future returned by [`Channel::send`] and  [`Sender::send`].
-</span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
-</span><span class="kw">pub struct </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt;
+</span><span class="kw">pub struct </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>Channel&lt;M, T, N&gt;,
+    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span>PriorityChannel&lt;M, T, K, N&gt;,
     message: <span class="prelude-ty">Option</span>&lt;T&gt;,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Future <span class="kw">for </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Future <span class="kw">for </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="kw">type </span>Output = ();
 
@@ -1001,72 +830,28 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, <span class="kw">const </span>N: usize&gt; Unpin <span class="kw">for </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, N&gt; <span class="kw">where </span>M: RawMutex {}
-
-<span class="doccomment">/// Future returned by [`DynamicSender::send`].
-</span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
-</span><span class="kw">pub struct </span>DynamicSendFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    channel: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ch </span><span class="kw">dyn </span>DynamicChannel&lt;T&gt;,
-    message: <span class="prelude-ty">Option</span>&lt;T&gt;,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, M, T, K, <span class="kw">const </span>N: usize&gt; Unpin <span class="kw">for </span>SendFuture&lt;<span class="lifetime">&#39;ch</span>, M, T, K, N&gt;
+<span class="kw">where
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
+{
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Future <span class="kw">for </span>DynamicSendFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {
-    <span class="kw">type </span>Output = ();
-
-    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
-        <span class="kw">match </span><span class="self">self</span>.message.take() {
-            <span class="prelude-val">Some</span>(m) =&gt; <span class="kw">match </span><span class="self">self</span>.channel.try_send_with_context(m, <span class="prelude-val">Some</span>(cx)) {
-                <span class="prelude-val">Ok</span>(..) =&gt; Poll::Ready(()),
-                <span class="prelude-val">Err</span>(TrySendError::Full(m)) =&gt; {
-                    <span class="self">self</span>.message = <span class="prelude-val">Some</span>(m);
-                    Poll::Pending
-                }
-            },
-            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Message cannot be None&quot;</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ch</span>, T&gt; Unpin <span class="kw">for </span>DynamicSendFuture&lt;<span class="lifetime">&#39;ch</span>, T&gt; {}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>DynamicChannel&lt;T&gt; {
-    <span class="kw">fn </span>try_send_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt;;
-
-    <span class="kw">fn </span>try_receive_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryReceiveError&gt;;
-
-    <span class="kw">fn </span>poll_ready_to_send(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt;;
-    <span class="kw">fn </span>poll_ready_to_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt;;
-
-    <span class="kw">fn </span>poll_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt;;
-}
-
-<span class="doccomment">/// Error returned by [`try_receive`](Channel::try_receive).
-</span><span class="attr">#[derive(PartialEq, Eq, Clone, Copy, Debug)]
-#[cfg_attr(feature = <span class="string">&quot;defmt&quot;</span>, derive(defmt::Format))]
-</span><span class="kw">pub enum </span>TryReceiveError {
-    <span class="doccomment">/// A message could not be received because the channel is empty.
-    </span>Empty,
-}
-
-<span class="doccomment">/// Error returned by [`try_send`](Channel::try_send).
-</span><span class="attr">#[derive(PartialEq, Eq, Clone, Copy, Debug)]
-#[cfg_attr(feature = <span class="string">&quot;defmt&quot;</span>, derive(defmt::Format))]
-</span><span class="kw">pub enum </span>TrySendError&lt;T&gt; {
-    <span class="doccomment">/// The data could not be sent on the channel because the channel is
-    /// currently full and sending would require blocking.
-    </span>Full(T),
-}
-
-<span class="kw">struct </span>ChannelState&lt;T, <span class="kw">const </span>N: usize&gt; {
-    queue: Deque&lt;T, N&gt;,
+<span class="kw">struct </span>ChannelState&lt;T, K, <span class="kw">const </span>N: usize&gt; {
+    queue: BinaryHeap&lt;T, K, N&gt;,
     receiver_waker: WakerRegistration,
     senders_waker: WakerRegistration,
 }
 
-<span class="kw">impl</span>&lt;T, <span class="kw">const </span>N: usize&gt; ChannelState&lt;T, N&gt; {
+<span class="kw">impl</span>&lt;T, K, <span class="kw">const </span>N: usize&gt; ChannelState&lt;T, K, N&gt;
+<span class="kw">where
+    </span>T: Ord,
+    K: Kind,
+{
     <span class="kw">const fn </span>new() -&gt; <span class="self">Self </span>{
         ChannelState {
-            queue: Deque::new(),
+            queue: BinaryHeap::new(),
             receiver_waker: WakerRegistration::new(),
             senders_waker: WakerRegistration::new(),
         }
@@ -1077,11 +862,11 @@
     }
 
     <span class="kw">fn </span>try_receive_with_context(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryReceiveError&gt; {
-        <span class="kw">if </span><span class="self">self</span>.queue.is_full() {
+        <span class="kw">if </span><span class="self">self</span>.queue.len() == <span class="self">self</span>.queue.capacity() {
             <span class="self">self</span>.senders_waker.wake();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.queue.pop_front() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.queue.pop() {
             <span class="prelude-val">Ok</span>(message)
         } <span class="kw">else </span>{
             <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx {
@@ -1092,11 +877,11 @@
     }
 
     <span class="kw">fn </span>poll_receive(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
-        <span class="kw">if </span><span class="self">self</span>.queue.is_full() {
+        <span class="kw">if </span><span class="self">self</span>.queue.len() == <span class="self">self</span>.queue.capacity() {
             <span class="self">self</span>.senders_waker.wake();
         }
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.queue.pop_front() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.queue.pop() {
             Poll::Ready(message)
         } <span class="kw">else </span>{
             <span class="self">self</span>.receiver_waker.register(cx.waker());
@@ -1119,7 +904,7 @@
     }
 
     <span class="kw">fn </span>try_send_with_context(<span class="kw-2">&amp;mut </span><span class="self">self</span>, message: T, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
-        <span class="kw">match </span><span class="self">self</span>.queue.push_back(message) {
+        <span class="kw">match </span><span class="self">self</span>.queue.push(message) {
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="self">self</span>.receiver_waker.wake();
                 <span class="prelude-val">Ok</span>(())
@@ -1136,7 +921,7 @@
     <span class="kw">fn </span>poll_ready_to_send(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
         <span class="self">self</span>.senders_waker.register(cx.waker());
 
-        <span class="kw">if </span>!<span class="self">self</span>.queue.is_full() {
+        <span class="kw">if </span>!<span class="self">self</span>.queue.len() == <span class="self">self</span>.queue.capacity() {
             Poll::Ready(())
         } <span class="kw">else </span>{
             Poll::Pending
@@ -1151,26 +936,32 @@
 /// buffer is full, attempts to `send` new messages will wait until a message is
 /// received from the channel.
 ///
-/// All data sent will become available in the same order as it was sent.
-</span><span class="kw">pub struct </span>Channel&lt;M, T, <span class="kw">const </span>N: usize&gt;
+/// Sent data may be reordered based on their priorty within the channel.
+/// For example, in a [`Max`](heapless::binary_heap::Max) [`PriorityChannel`]
+/// containing `u32`&#39;s, data sent in the following order `[1, 2, 3]` will be recieved as `[3, 2, 1]`.
+</span><span class="kw">pub struct </span>PriorityChannel&lt;M, T, K, <span class="kw">const </span>N: usize&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
-    inner: Mutex&lt;M, RefCell&lt;ChannelState&lt;T, N&gt;&gt;&gt;,
+    inner: Mutex&lt;M, RefCell&lt;ChannelState&lt;T, K, N&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;M, T, <span class="kw">const </span>N: usize&gt; Channel&lt;M, T, N&gt;
+<span class="kw">impl</span>&lt;M, T, K, <span class="kw">const </span>N: usize&gt; PriorityChannel&lt;M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="doccomment">/// Establish a new bounded channel. For example, to create one with a NoopMutex:
     ///
     /// ```
-    /// use embassy_sync::channel::Channel;
+    /// use embassy_sync::priority_channel::{PriorityChannel, Max};
     /// use embassy_sync::blocking_mutex::raw::NoopRawMutex;
     ///
     /// // Declare a bounded channel of 3 u32s.
-    /// let mut channel = Channel::&lt;NoopRawMutex, u32, 3&gt;::new();
+    /// let mut channel = PriorityChannel::&lt;NoopRawMutex, u32, Max, 3&gt;::new();
     /// ```
     </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -1178,7 +969,7 @@
         }
     }
 
-    <span class="kw">fn </span>lock&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ChannelState&lt;T, N&gt;) -&gt; R) -&gt; R {
+    <span class="kw">fn </span>lock&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ChannelState&lt;T, K, N&gt;) -&gt; R) -&gt; R {
         <span class="self">self</span>.inner.lock(|rc| f(<span class="kw-2">&amp;mut *</span><span class="macro">unwrap!</span>(rc.try_borrow_mut())))
     }
 
@@ -1206,12 +997,12 @@
     }
 
     <span class="doccomment">/// Get a sender for this channel.
-    </span><span class="kw">pub fn </span>sender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;<span class="lifetime">&#39;_</span>, M, T, N&gt; {
+    </span><span class="kw">pub fn </span>sender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;<span class="lifetime">&#39;_</span>, M, T, K, N&gt; {
         Sender { channel: <span class="self">self </span>}
     }
 
     <span class="doccomment">/// Get a receiver for this channel.
-    </span><span class="kw">pub fn </span>receiver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Receiver&lt;<span class="lifetime">&#39;_</span>, M, T, N&gt; {
+    </span><span class="kw">pub fn </span>receiver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Receiver&lt;<span class="lifetime">&#39;_</span>, M, T, K, N&gt; {
         Receiver { channel: <span class="self">self </span>}
     }
 
@@ -1219,7 +1010,7 @@
     ///
     /// Sending completes when the value has been pushed to the channel&#39;s queue.
     /// This doesn&#39;t mean the value has been received yet.
-    </span><span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; SendFuture&lt;<span class="lifetime">&#39;_</span>, M, T, N&gt; {
+    </span><span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; SendFuture&lt;<span class="lifetime">&#39;_</span>, M, T, K, N&gt; {
         SendFuture {
             channel: <span class="self">self</span>,
             message: <span class="prelude-val">Some</span>(message),
@@ -1228,13 +1019,13 @@
 
     <span class="doccomment">/// Attempt to immediately send a message.
     ///
-    /// This method differs from [`send`](Channel::send) by returning immediately if the channel&#39;s
+    /// This method differs from [`send`](PriorityChannel::send) by returning immediately if the channel&#39;s
     /// buffer is full, instead of waiting.
     ///
     /// # Errors
     ///
     /// If the channel capacity has been reached, i.e., the channel has `n`
-    /// buffered values where `n` is the argument passed to [`Channel`], then an
+    /// buffered values where `n` is the argument passed to [`PriorityChannel`], then an
     /// error is returned.
     </span><span class="kw">pub fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, message: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
         <span class="self">self</span>.lock(|c| c.try_send(message))
@@ -1244,7 +1035,7 @@
     ///
     /// If there are no messages in the channel&#39;s buffer, this method will
     /// wait until a message is sent.
-    </span><span class="kw">pub fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReceiveFuture&lt;<span class="lifetime">&#39;_</span>, M, T, N&gt; {
+    </span><span class="kw">pub fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReceiveFuture&lt;<span class="lifetime">&#39;_</span>, M, T, K, N&gt; {
         ReceiveFuture { channel: <span class="self">self </span>}
     }
 
@@ -1259,28 +1050,30 @@
 
 <span class="doccomment">/// Implements the DynamicChannel to allow creating types that are unaware of the queue size with the
 /// tradeoff cost of dynamic dispatch.
-</span><span class="kw">impl</span>&lt;M, T, <span class="kw">const </span>N: usize&gt; DynamicChannel&lt;T&gt; <span class="kw">for </span>Channel&lt;M, T, N&gt;
+</span><span class="kw">impl</span>&lt;M, T, K, <span class="kw">const </span>N: usize&gt; DynamicChannel&lt;T&gt; <span class="kw">for </span>PriorityChannel&lt;M, T, K, N&gt;
 <span class="kw">where
-    </span>M: RawMutex,
+    </span>T: Ord,
+    K: Kind,
+    M: RawMutex,
 {
     <span class="kw">fn </span>try_send_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, m: T, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
-        Channel::try_send_with_context(<span class="self">self</span>, m, cx)
+        PriorityChannel::try_send_with_context(<span class="self">self</span>, m, cx)
     }
 
     <span class="kw">fn </span>try_receive_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryReceiveError&gt; {
-        Channel::try_receive_with_context(<span class="self">self</span>, cx)
+        PriorityChannel::try_receive_with_context(<span class="self">self</span>, cx)
     }
 
     <span class="kw">fn </span>poll_ready_to_send(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
-        Channel::poll_ready_to_send(<span class="self">self</span>, cx)
+        PriorityChannel::poll_ready_to_send(<span class="self">self</span>, cx)
     }
 
     <span class="kw">fn </span>poll_ready_to_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
-        Channel::poll_ready_to_receive(<span class="self">self</span>, cx)
+        PriorityChannel::poll_ready_to_receive(<span class="self">self</span>, cx)
     }
 
     <span class="kw">fn </span>poll_receive(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
-        Channel::poll_receive(<span class="self">self</span>, cx)
+        PriorityChannel::poll_receive(<span class="self">self</span>, cx)
     }
 }
 
@@ -1291,25 +1084,30 @@
     <span class="kw">use </span>futures_executor::ThreadPool;
     <span class="kw">use </span>futures_timer::Delay;
     <span class="kw">use </span>futures_util::task::SpawnExt;
+    <span class="kw">use </span>heapless::binary_heap::{Kind, Max};
     <span class="kw">use </span>static_cell::StaticCell;
 
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::blocking_mutex::raw::{CriticalSectionRawMutex, NoopRawMutex};
 
-    <span class="kw">fn </span>capacity&lt;T, <span class="kw">const </span>N: usize&gt;(c: <span class="kw-2">&amp;</span>ChannelState&lt;T, N&gt;) -&gt; usize {
+    <span class="kw">fn </span>capacity&lt;T, K, <span class="kw">const </span>N: usize&gt;(c: <span class="kw-2">&amp;</span>ChannelState&lt;T, K, N&gt;) -&gt; usize
+    <span class="kw">where
+        </span>T: Ord,
+        K: Kind,
+    {
         c.queue.capacity() - c.queue.len()
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>sending_once() {
-        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, Max, <span class="number">3</span>&gt;::new();
         <span class="macro">assert!</span>(c.try_send(<span class="number">1</span>).is_ok());
         <span class="macro">assert_eq!</span>(capacity(<span class="kw-2">&amp;</span>c), <span class="number">2</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>sending_when_full() {
-        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, Max, <span class="number">3</span>&gt;::new();
         <span class="kw">let _ </span>= c.try_send(<span class="number">1</span>);
         <span class="kw">let _ </span>= c.try_send(<span class="number">1</span>);
         <span class="kw">let _ </span>= c.try_send(<span class="number">1</span>);
@@ -1321,8 +1119,20 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>send_priority() {
+        <span class="comment">// Prio channel with kind `Max` sifts larger numbers to the front of the queue
+        </span><span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, Max, <span class="number">3</span>&gt;::new();
+        <span class="macro">assert!</span>(c.try_send(<span class="number">1</span>).is_ok());
+        <span class="macro">assert!</span>(c.try_send(<span class="number">2</span>).is_ok());
+        <span class="macro">assert!</span>(c.try_send(<span class="number">3</span>).is_ok());
+        <span class="macro">assert_eq!</span>(c.try_receive().unwrap(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(c.try_receive().unwrap(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(c.try_receive().unwrap(), <span class="number">1</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>receiving_once_with_one_send() {
-        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, Max, <span class="number">3</span>&gt;::new();
         <span class="macro">assert!</span>(c.try_send(<span class="number">1</span>).is_ok());
         <span class="macro">assert_eq!</span>(c.try_receive().unwrap(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(capacity(<span class="kw-2">&amp;</span>c), <span class="number">3</span>);
@@ -1330,7 +1140,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>receiving_when_empty() {
-        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>c = ChannelState::&lt;u32, Max, <span class="number">3</span>&gt;::new();
         <span class="kw">match </span>c.try_receive() {
             <span class="prelude-val">Err</span>(TryReceiveError::Empty) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
             <span class="kw">_ </span>=&gt; <span class="macro">assert!</span>(<span class="bool-val">false</span>),
@@ -1340,14 +1150,14 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>simple_send_and_receive() {
-        <span class="kw">let </span>c = Channel::&lt;NoopRawMutex, u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span>c = PriorityChannel::&lt;NoopRawMutex, u32, Max, <span class="number">3</span>&gt;::new();
         <span class="macro">assert!</span>(c.try_send(<span class="number">1</span>).is_ok());
         <span class="macro">assert_eq!</span>(c.try_receive().unwrap(), <span class="number">1</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>cloning() {
-        <span class="kw">let </span>c = Channel::&lt;NoopRawMutex, u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span>c = PriorityChannel::&lt;NoopRawMutex, u32, Max, <span class="number">3</span>&gt;::new();
         <span class="kw">let </span>r1 = c.receiver();
         <span class="kw">let </span>s1 = c.sender();
 
@@ -1357,7 +1167,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>dynamic_dispatch() {
-        <span class="kw">let </span>c = Channel::&lt;NoopRawMutex, u32, <span class="number">3</span>&gt;::new();
+        <span class="kw">let </span>c = PriorityChannel::&lt;NoopRawMutex, u32, Max, <span class="number">3</span>&gt;::new();
         <span class="kw">let </span>s: DynamicSender&lt;<span class="lifetime">&#39;_</span>, u32&gt; = c.sender().into();
         <span class="kw">let </span>r: DynamicReceiver&lt;<span class="lifetime">&#39;_</span>, u32&gt; = c.receiver().into();
 
@@ -1369,8 +1179,8 @@
     </span><span class="kw">async fn </span>receiver_receives_given_try_send_async() {
         <span class="kw">let </span>executor = ThreadPool::new().unwrap();
 
-        <span class="kw">static </span>CHANNEL: StaticCell&lt;Channel&lt;CriticalSectionRawMutex, u32, <span class="number">3</span>&gt;&gt; = StaticCell::new();
-        <span class="kw">let </span>c = <span class="kw-2">&amp;*</span>CHANNEL.init(Channel::new());
+        <span class="kw">static </span>CHANNEL: StaticCell&lt;PriorityChannel&lt;CriticalSectionRawMutex, u32, Max, <span class="number">3</span>&gt;&gt; = StaticCell::new();
+        <span class="kw">let </span>c = <span class="kw-2">&amp;*</span>CHANNEL.init(PriorityChannel::new());
         <span class="kw">let </span>c2 = c;
         <span class="macro">assert!</span>(executor
             .spawn(<span class="kw">async move </span>{
@@ -1382,7 +1192,7 @@
 
     <span class="attr">#[futures_test::test]
     </span><span class="kw">async fn </span>sender_send_completes_if_capacity() {
-        <span class="kw">let </span>c = Channel::&lt;CriticalSectionRawMutex, u32, <span class="number">1</span>&gt;::new();
+        <span class="kw">let </span>c = PriorityChannel::&lt;CriticalSectionRawMutex, u32, Max, <span class="number">1</span>&gt;::new();
         c.send(<span class="number">1</span>).<span class="kw">await</span>;
         <span class="macro">assert_eq!</span>(c.receive().<span class="kw">await</span>, <span class="number">1</span>);
     }
@@ -1391,8 +1201,8 @@
     </span><span class="kw">async fn </span>senders_sends_wait_until_capacity() {
         <span class="kw">let </span>executor = ThreadPool::new().unwrap();
 
-        <span class="kw">static </span>CHANNEL: StaticCell&lt;Channel&lt;CriticalSectionRawMutex, u32, <span class="number">1</span>&gt;&gt; = StaticCell::new();
-        <span class="kw">let </span>c = <span class="kw-2">&amp;*</span>CHANNEL.init(Channel::new());
+        <span class="kw">static </span>CHANNEL: StaticCell&lt;PriorityChannel&lt;CriticalSectionRawMutex, u32, Max, <span class="number">1</span>&gt;&gt; = StaticCell::new();
+        <span class="kw">let </span>c = <span class="kw-2">&amp;*</span>CHANNEL.init(PriorityChannel::new());
         <span class="macro">assert!</span>(c.try_send(<span class="number">1</span>).is_ok());
 
         <span class="kw">let </span>c2 = c;

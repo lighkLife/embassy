@@ -19,6 +19,7 @@
 <a href="#19" id="19">19</a>
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(not(any(feature = <span class="string">&quot;std&quot;</span>, feature = <span class="string">&quot;wasm&quot;</span>)), no_std)]
 #![cfg_attr(feature = <span class="string">&quot;nightly&quot;</span>, feature(async_fn_in_trait, impl_trait_projections))]
 #![cfg_attr(feature = <span class="string">&quot;nightly&quot;</span>, allow(stable_features, unknown_lints, async_fn_in_trait))]
@@ -36,6 +37,7 @@
 <span class="kw">pub mod </span>channel;
 <span class="kw">pub mod </span>mutex;
 <span class="kw">pub mod </span>pipe;
+<span class="kw">pub mod </span>priority_channel;
 <span class="kw">pub mod </span>pubsub;
 <span class="kw">pub mod </span>signal;
 <span class="kw">pub mod </span>waitqueue;
