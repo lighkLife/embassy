@@ -93,6 +93,27 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(feature = <span class="string">&quot;executor-interrupt&quot;</span>)]
 </span><span class="macro">compile_error!</span>(<span class="string">&quot;`executor-interrupt` is not supported with `arch-std`.&quot;</span>);
 
@@ -114,7 +135,10 @@
         signaler.signal()
     }
 
-    <span class="doccomment">/// Single-threaded std-based executor.
+    <span class="doccomment">/// std 环境下的单线程执行器
+    ///
+    /// ---
+    /// Single-threaded std-based executor.
     </span><span class="kw">pub struct </span>Executor {
         inner: raw::Executor,
         not_send: PhantomData&lt;<span class="kw-2">*mut </span>()&gt;,
@@ -132,7 +156,25 @@
             }
         }
 
-        <span class="doccomment">/// Run the executor.
+        <span class="doccomment">/// 启动执行器
+        ///
+        /// 这里调用 `init` 闭包，通过 [`Spawner`] 在当前执行器上生成任务。使用它来生成初始任务。
+        /// `init` 返回后，执行器开始运行任务。
+        ///
+        /// 为了后面生成其他的任务，你可以保存 [`Spawner``]的副本(它是 `Copy`的)，例如，通过将其
+        /// 作为参数传递给初始任务。
+        ///
+        /// 这个函数需要 `&amp;&#39;static mut self`。换而言之， Executor 实例需要永久存储，并允许可变访问。
+        /// 下面这些方法可以实现：
+        ///
+        /// - 使用 [StaticCell](https://docs.rs/static_cell/latest/static_cell/) (safe)
+        /// - 使用 `static mut` (unsafe)
+        /// - 保存在局变量中，但需要当前函数是永远不会返回的（比如 `fn main() -&gt; !`），使用 `transmute` 来升级他的生命周期（unsafe）。
+        ///
+        /// 这个函数永远不会返回
+        ///
+        /// ---
+        /// Run the executor.
         ///
         /// The `init` closure is called with a [`Spawner`] that spawns tasks on
         /// this executor. Use it to spawn the initial task(s). After `init` returns,
