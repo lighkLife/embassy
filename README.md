@@ -17,6 +17,7 @@
 
 | Crate            | File          | Translation author                        | Status      | Reviser |
 |------------------|---------------|-------------------------------------------|:------------|---------|
+| embassy-executor |  README.md    | [LighkLife](https://github.com/lighkLife) | Done        |         |
 | embassy-executor | `arch/std.rs` | [LighkLife](https://github.com/lighkLife) | in progress |         |
 | embassy-futures  |               |                                           |             |         |
 | embassy-time     |               | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
@@ -28,4 +29,3 @@
 |                  |               |                                           |             |         |
 |                  |               |                                           |             |         |
 |                  |               |                                           |             |         |
-
