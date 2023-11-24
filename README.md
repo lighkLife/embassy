@@ -14,18 +14,25 @@
 3. 使用分割线`---`来分割中英文注释。 
 
 ## 翻译登记
-
-| Crate            | File          | Translation author                        | Status      | Reviser |
-|------------------|---------------|-------------------------------------------|:------------|---------|
-| embassy-executor |  README.md    | [LighkLife](https://github.com/lighkLife) | Done        |         |
-| embassy-executor | `arch/std.rs` | [LighkLife](https://github.com/lighkLife) | in progress |         |
-| embassy-futures  |               |                                           |             |         |
-| embassy-time     |               | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
-|                  |               |                                           |             |         |
+| Crate            | File                 | Translation author                        | Status      | Reviser |
+|------------------|----------------------|-------------------------------------------|:------------|---------|
+| embassy-executor | `README.md`          | [LighkLife](https://github.com/lighkLife) | Done        |         |
+| embassy-executor | `arch/std.rs`        | [LighkLife](https://github.com/lighkLife) | in progress |         |
+| embassy-executor | `arch/riscv32.rs`    | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `lib.rs`             | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `spawner.rs`         | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `raw/mod.rs`         | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `raw/run_queue.rs`   | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `raw/timer_queue.rs` | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `raw/waker_turbo.rs` | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-executor | `raw/waker.rs`       | [LighkLife](https://github.com/lighkLife) |             |         |
+| embassy-futures  |                      |                                           |             |         |
+| embassy-time     |                      | [ziyouwa](https://github.com/ziyouwa)     | in progress |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
+|                  |                      |                                           |             |         |
