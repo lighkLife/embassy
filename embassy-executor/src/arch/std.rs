@@ -19,6 +19,9 @@ mod thread {
         signaler.signal()
     }
 
+    /// std 环境下的单线程执行器
+    ///
+    /// ---
     /// Single-threaded std-based executor.
     pub struct Executor {
         inner: raw::Executor,
@@ -37,6 +40,24 @@ mod thread {
             }
         }
 
+        /// 启动执行器
+        ///
+        /// 这里调用 `init` 闭包，通过 [`Spawner`] 在当前执行器上生成任务。使用它来生成初始任务。
+        /// `init` 返回后，执行器开始运行任务。
+        ///
+        /// 为了后面生成其他的任务，你可以保存 [`Spawner``]的副本(它是 `Copy`的)，例如，通过将其
+        /// 作为参数传递给初始任务。
+        ///
+        /// 这个函数需要 `&'static mut self`。换而言之， Executor 实例需要永久存储，并允许可变访问。
+        /// 下面这些方法可以实现：
+        ///
+        /// - 使用 [StaticCell](https://docs.rs/static_cell/latest/static_cell/) (safe)
+        /// - 使用 `static mut` (unsafe)
+        /// - 保存在局变量中，但需要当前函数是永远不会返回的（比如 `fn main() -> !`），使用 `transmute` 来升级他的生命周期（unsafe）。
+        ///
+        /// 这个函数永远不会返回
+        ///
+        /// ---
         /// Run the executor.
         ///
         /// The `init` closure is called with a [`Spawner`] that spawns tasks on
