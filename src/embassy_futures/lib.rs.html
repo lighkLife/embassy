@@ -13,11 +13,13 @@
 <a href="#13" id="13">13</a>
 <a href="#14" id="14">14</a>
 <a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
 </pre></div><pre class="rust"><code><span class="attr">#![no_std]
 #![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
 #![warn(missing_docs)]
 
-</span><span class="comment">// This mod MUST go first, so that the others see its macros.
+</span><span class="comment">// 这个模块必须放在前面，这样其他模块才能看到它的宏。 &lt;br /&gt;
+// This mod MUST go first, so that the others see its macros.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>fmt;
 
 <span class="kw">mod </span>block_on;
