@@ -1,19 +1,30 @@
+//! 等待多个future中第一个完成的future <br />
 //! Wait for the first of several futures to complete.
 
 use core::future::Future;
 use core::pin::Pin;
 use core::task::{Context, Poll};
 
+/// [`select`]的输出结果 <br />
 /// Result for [`select`].
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Either<A, B> {
+    /// 第一个future先完成 <br />
     /// First future finished first.
     First(A),
+    /// 第二个future先完成 <br />
     /// Second future finished first.
     Second(B),
 }
 
+/// 等待两个future中的其中一个完成
+///
+/// 这个函数返回一个新的future，它会轮询所有的futures。
+/// 只要他们其中有一个已经运行结束，就立即可以作为结果返回
+///
+/// 其他的future会被丢弃
+/// ---
 /// Wait for one of two futures to complete.
 ///
 /// This function returns a new future which polls all the futures.
@@ -28,6 +39,7 @@ where
     Select { a, b }
 }
 
+/// 用于 [`select`] 函数的Future。 <br />
 /// Future for the [`select`] function.
 #[derive(Debug)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
@@ -61,18 +73,23 @@ where
 
 // ====================================================================
 
-/// Result for [`select3`].
+/// [`select3`]的输出结果。 <br />
+/// Result for [`select3`]. 
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Either3<A, B, C> {
+    /// 第一个future先完成 <br />
     /// First future finished first.
     First(A),
+    /// 第二个future先完成 <br />
     /// Second future finished first.
     Second(B),
+    /// 第三个future先完成 <br />
     /// Third future finished first.
     Third(C),
 }
 
+/// 跟[`select`]一样, 只不过支持更多个future。<br />
 /// Same as [`select`], but with more futures.
 pub fn select3<A, B, C>(a: A, b: B, c: C) -> Select3<A, B, C>
 where
@@ -83,6 +100,7 @@ where
     Select3 { a, b, c }
 }
 
+/// 用于 [`select3`] 函数的Future。 <br />
 /// Future for the [`select3`] function.
 #[derive(Debug)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
@@ -120,20 +138,26 @@ where
 
 // ====================================================================
 
+/// [`select4`]的输出结果。 <br />
 /// Result for [`select4`].
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Either4<A, B, C, D> {
+    /// 第一个future先完成 <br />
     /// First future finished first.
     First(A),
+    /// 第二个future先完成 <br />
     /// Second future finished first.
     Second(B),
+    /// 第三个future先完成 <br />
     /// Third future finished first.
     Third(C),
+    /// 第四个future先完成 <br />
     /// Fourth future finished first.
     Fourth(D),
 }
 
+/// 跟[`select`]一样, 只不过支持更多个future。 <br />
 /// Same as [`select`], but with more futures.
 pub fn select4<A, B, C, D>(a: A, b: B, c: C, d: D) -> Select4<A, B, C, D>
 where
@@ -145,6 +169,7 @@ where
     Select4 { a, b, c, d }
 }
 
+/// 用于 [`select4`] 函数的Future。 <br />
 /// Future for the [`select4`] function.
 #[derive(Debug)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
@@ -188,6 +213,7 @@ where
 
 // ====================================================================
 
+/// 用于 [`select_array`] 函数的Future。 <br />
 /// Future for the [`select_array`] function.
 #[derive(Debug)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
@@ -195,6 +221,14 @@ pub struct SelectArray<Fut, const N: usize> {
     inner: [Fut; N],
 }
 
+/// 创建一个新的 future，它将在 所有future组成的数组中 选择合适的future。
+///
+/// 返回的future将会等待任何一个future准备就绪，
+/// 一旦其完成，将返回解析的项目，以及准备就绪的 future 的索引。
+///
+///  如果数组为空，那么结果 future 将永远处于 Pending 状态。
+/// 
+/// ---
 /// Creates a new future which will select over an array of futures.
 ///
 /// The returned future will wait for any future to be ready. Upon
@@ -210,6 +244,8 @@ impl<Fut: Future, const N: usize> Future for SelectArray<Fut, N> {
     type Output = (Fut::Output, usize);
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        // 由于 self 被固定（pinned），inner 无法move。由于 inner 无法move，其元素也无法move。
+        // 因此，访问 inner 并固定（pin）对包含的 futures 的引用是安全的。”
         // Safety: Since `self` is pinned, `inner` cannot move. Since `inner` cannot move,
         // its elements also cannot move. Therefore it is safe to access `inner` and pin
         // references to the contained futures.
@@ -233,6 +269,7 @@ impl<Fut: Future, const N: usize> Future for SelectArray<Fut, N> {
 
 // ====================================================================
 
+/// 用于 [`select_slice`] 函数的Futrue。 <br />
 /// Future for the [`select_slice`] function.
 #[derive(Debug)]
 #[must_use = "futures do nothing unless you `.await` or poll them"]
@@ -240,6 +277,14 @@ pub struct SelectSlice<'a, Fut> {
     inner: &'a mut [Fut],
 }
 
+/// 创建一个新的 future，它将在 所有future组成的切片中 选择合适的future。
+///
+/// 返回的future将会等待任何一个future准备就绪，
+/// 一旦其完成，将返回解析的项目，以及准备就绪的 future 的索引。
+///
+///  如果切片为空，那么结果 future 将永远处于 Pending 状态。
+///
+/// ---
 /// Creates a new future which will select over a slice of futures.
 ///
 /// The returned future will wait for any future to be ready. Upon
@@ -255,6 +300,8 @@ impl<'a, Fut: Future> Future for SelectSlice<'a, Fut> {
     type Output = (Fut::Output, usize);
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
+        // 由于 self 被固定（pinned），inner 无法move。由于 inner 无法move，其元素也无法move。
+        // 因此，访问 inner 并固定（pin）对包含的 futures 的引用是安全的。”
         // Safety: Since `self` is pinned, `inner` cannot move. Since `inner` cannot move,
         // its elements also cannot move. Therefore it is safe to access `inner` and pin
         // references to the contained futures.
