@@ -1,3 +1,4 @@
+//! 等待多个future完成。 <br />
 //! Wait for multiple futures to complete.
 
 use core::future::Future;
@@ -8,10 +9,15 @@ use core::{fmt, mem};
 
 #[derive(Debug)]
 enum MaybeDone<Fut: Future> {
+    /// 一个尚未完成的future 
     /// A not-yet-completed future
     Future(/* #[pin] */ Fut),
+    /// 一个已完成的future的输出
     /// The output of the completed future
     Done(Fut::Output),
+    /// 当使用[MaybeDone]的take_output方法取出结果后，MaybeDone将变为空状态。
+    /// 也就是说，一旦我们从MaybeDone中取出了结果，它就会变成Gone状态，表示没有任何内容了。
+    /// 如果再次尝试从这个MaybeDone中取出结果，将会引发panic。这是一种防止重复使用结果的机制。
     /// The empty variant after the result of a [`MaybeDone`] has been
     /// taken using the [`take_output`](MaybeDone::take_output) method.
     Gone,
@@ -106,19 +112,30 @@ macro_rules! generate {
 }
 
 generate! {
+    /// 用于 [`join`](join()) 函数的Future。 <br />
     /// Future for the [`join`](join()) function.
     (Join, <Fut1, Fut2>),
 
+    /// 用于 [`join3`] 函数的Future。 <br />
     /// Future for the [`join3`] function.
     (Join3, <Fut1, Fut2, Fut3>),
 
+    /// 用于 [`join4`] 函数的Future。 <br />
     /// Future for the [`join4`] function.
     (Join4, <Fut1, Fut2, Fut3, Fut4>),
 
+    /// 用于 [`join5`] 函数的Future。 <br />
     /// Future for the [`join5`] function.
     (Join5, <Fut1, Fut2, Fut3, Fut4, Fut5>),
 }
-
+/// 合并两个future的结果，等待他们都完成
+///
+/// 本函数将以await的方式等待两个future都完成，并返回一个新的future
+/// 返回的future会以两个future的结果所组成的元组的方式进行输出。
+///
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+///
+/// ---
 /// Joins the result of two futures, waiting for them both to complete.
 ///
 /// This function will return a new future which awaits both futures to
@@ -147,6 +164,14 @@ where
     Join::new(future1, future2)
 }
 
+/// 合并三个future的结果，等待他们都完成
+///
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
+///
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+///
+///---
 /// Joins the result of three futures, waiting for them all to complete.
 ///
 /// This function will return a new future which awaits all futures to
@@ -177,6 +202,14 @@ where
     Join3::new(future1, future2, future3)
 }
 
+/// 合并四个future的结果，等待他们都完成
+///
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
+///
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+///
+/// ---
 /// Joins the result of four futures, waiting for them all to complete.
 ///
 /// This function will return a new future which awaits all futures to
@@ -214,6 +247,14 @@ where
     Join4::new(future1, future2, future3, future4)
 }
 
+/// 合并五个future的结果，等待他们都完成
+///
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
+///
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+///
+/// ---
 /// Joins the result of five futures, waiting for them all to complete.
 ///
 /// This function will return a new future which awaits all futures to
@@ -256,6 +297,7 @@ where
 
 // =====================================================
 
+/// 用于 [`join_array`] 函数的Future。 <br />
 /// Future for the [`join_array`] function.
 #[must_use = "futures do nothing unless you `.await` or poll them"]
 pub struct JoinArray<Fut: Future, const N: usize> {
@@ -293,6 +335,14 @@ impl<Fut: Future, const N: usize> Future for JoinArray<Fut, N> {
     }
 }
 
+/// 合并一个future数组中所有future的结果，等待他们都完成
+///
+/// 本函数将以await的方式等待所有future都完成，并返回一个新的future
+/// 返回的future会以所有future的结果所组成的元组的方式进行输出。
+///
+/// 注意，该函数会消耗传递的future，并会返回一个对其进行了封装的版本。
+///
+/// ---
 /// Joins the result of an array of futures, waiting for them all to complete.
 ///
 /// This function will return a new future which awaits all futures to
