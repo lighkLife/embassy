@@ -1,3 +1,12 @@
+//! 原生执行器
+//!
+//! 这个模块暴露 "原生" 执行器和任务结构体，可以用作更低层次的控制。
+//!
+//! ## 警告： 这里有危险
+//! 使用这个模块需要尊重微妙的安全契约。更推荐使用[executor wrappers](crate::Executor)和
+//! [`embassy_executor::task`](embassy_macros::task)宏，这些都是安全的。
+//!
+//! ---
 //! Raw executor.
 //!
 //! This module exposes "raw" Executor and Task structs for more low level control.
@@ -34,14 +43,26 @@ use self::util::{SyncUnsafeCell, UninitCell};
 pub use self::waker::task_from_waker;
 use super::SpawnToken;
 
+/// 任务被创建（拥有一个 future）
+///
+/// ---
 /// Task is spawned (has a future)
 pub(crate) const STATE_SPAWNED: u32 = 1 << 0;
+/// 任务在执行器的运行队列中
+///
+/// ---
 /// Task is in the executor run queue
 pub(crate) const STATE_RUN_QUEUED: u32 = 1 << 1;
+/// 任务在执行器的时间队列中
+///
+/// ---
 /// Task is in the executor timer queue
 #[cfg(feature = "integrated-timers")]
 pub(crate) const STATE_TIMER_QUEUED: u32 = 1 << 2;
 
+///  任务指针指向的原始任务头
+///
+/// ---
 /// Raw task header for use in task pointers.
 pub(crate) struct TaskHeader {
     pub(crate) state: AtomicU32,
@@ -55,6 +76,9 @@ pub(crate) struct TaskHeader {
     pub(crate) timer_queue_item: timer_queue::TimerQueueItem,
 }
 
+/// 这本质上是一个 `&'static TaskStorage<F>`，其中 Future 的类型已被擦除
+///
+/// ---
 /// This is essentially a `&'static TaskStorage<F>` where the type of the future has been erased.
 #[derive(Clone, Copy)]
 pub struct TaskRef {
@@ -71,6 +95,9 @@ impl TaskRef {
         }
     }
 
+    /// 安全的： 这个指针必须已经通过 `Task::as_ptr`来获取
+    ///
+    /// ---
     /// Safety: The pointer must have been obtained with `Task::as_ptr`
     pub(crate) unsafe fn from_ptr(ptr: *const TaskHeader) -> Self {
         Self {
@@ -82,12 +109,33 @@ impl TaskRef {
         unsafe { self.ptr.as_ref() }
     }
 
+    /// 返回的指针对于整个 TaskStorage 都是有效的
+    ///
+    /// ---
     /// The returned pointer is valid for the entire TaskStorage.
     pub(crate) fn as_ptr(self) -> *const TaskHeader {
         self.ptr.as_ptr()
     }
 }
 
+///
+/// 可以生成任务的原始存储器
+/// Raw storage in which a task can be spawned.
+///
+/// 这个结构体拥有生成一个 future 为 `F` 的任务所需的内存。
+/// 在给定的时间，`TaskStorage` 可能处于已生成或未生成状态。
+/// 你///可以使用 [`TaskStorage::spawn()`] 来生成它，如果它已经被生成，那么这个方法将会失败。
+///
+/// `TaskStorage` 必须一直存活，即使任务已经结束运行，它仍然不会被释放。因此，相关的方法需要 `&'static self`。
+/// 但是，它可以被重用。
+///
+/// [embassy_executor::task](embassy_macros::task) 宏内部会分配一个 `TaskStorage` 类型的静态数组。
+/// 使用原始 `Task` 的最常见原因是控制在哪里给任务非配内存：在栈上，或者在堆上，例如使用 `Box::leak` 等。
+///
+/// 需要使用 repr(C) 来保证任务在结构体的内存布局中，偏移量为 0
+/// 这使得 TaskHeader 和 TaskStorage 指针互相转换是安全的。
+///
+/// ---
 /// Raw storage in which a task can be spawned.
 ///
 /// This struct holds the necessary memory to spawn one task whose future is `F`.
@@ -112,6 +160,9 @@ pub struct TaskStorage<F: Future + 'static> {
 impl<F: Future + 'static> TaskStorage<F> {
     const NEW: Self = Self::new();
 
+    /// 创建一个新的人物存储器，处于未创建的状态
+    ///
+    /// ---
     /// Create a new TaskStorage, in not-spawned state.
     pub const fn new() -> Self {
         Self {
@@ -131,6 +182,24 @@ impl<F: Future + 'static> TaskStorage<F> {
         }
     }
 
+    /// 尝试创建任务
+    ///
+    /// `future` 闭包用来构造 future。 可以生成任务的情况下，它才被调用。它是一个闭包，
+    /// 而不是简单的 `future: F` 参数，用来确保在适当的位置构造 future，多亏 NRVO 优化，
+    /// 避免了在栈上的临时复制。
+    ///
+    /// 如果人物已经被创建，并且还没有运行结束，这个方法会失败。在这种情况下，这个错误会被推迟：
+    /// 返回一个空的 SpawnToken，从而导致调用 [`Spawner::spawn()`](super::Spawner::spawn)
+    /// 返回错误。
+    ///
+    /// 一旦任务已经运行结束，你可以再一次创建它。允许在另一个不同的执行器中创建它。
+    ///
+    /// NRVO优化，即命名返回值优化（Named Return Value Optimization），是Visual C++2005及之后版本支持的一种优化技术。
+    /// 当一个函数的返回值是一个对象时，正常的返回语句的执行过程是将这个对象从当前函数的局部作用域拷贝到返回区，以便调用者可以访问。
+    /// 然而，如果所有的返回语句都返回同一个对象，NRVO优化的作用是在这个对象建立的时候直接在返回区建立，
+    /// 从而避免了函数返回时调用拷贝构造函数的需要，减少了对象的创建与销毁过程。
+    ///
+    /// ---
     /// Try to spawn the task.
     ///
     /// The `future` closure constructs the future. It's only called if spawning is

@@ -26,10 +26,9 @@
 | embassy-executor | `lib.rs`             | [LighkLife](https://github.com/lighkLife) |        |         |
 | embassy-executor | `spawner.rs`         | [LighkLife](https://github.com/lighkLife) |        |         |
 | embassy-executor | `raw/mod.rs`         | [LighkLife](https://github.com/lighkLife) | Doing  |         |
-| embassy-executor | `raw/run_queue.rs`   | [LighkLife](https://github.com/lighkLife) |        |         |
-| embassy-executor | `raw/timer_queue.rs` | [LighkLife](https://github.com/lighkLife) |        |         |
-| embassy-executor | `raw/waker_turbo.rs` | [LighkLife](https://github.com/lighkLife) |        |         |
-| embassy-executor | `raw/waker.rs`       | [LighkLife](https://github.com/lighkLife) |        |         |
+| embassy-executor | `raw/run_queue.rs`   | [LighkLife](https://github.com/lighkLife) | Done   |         |
+| embassy-executor | `raw/waker_turbo.rs` | [LighkLife](https://github.com/lighkLife) | Done   |         |
+| embassy-executor | `raw/waker.rs`       | [LighkLife](https://github.com/lighkLife) | Done   |         |
 | embassy-futures  |                      |                                           |        |         |
 | embassy-time     |                      | [ziyouwa](https://github.com/ziyouwa)     | Doing  |         |
 |                  |                      |                                           |        |         |
