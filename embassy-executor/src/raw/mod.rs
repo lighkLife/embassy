@@ -292,8 +292,8 @@ impl<F: Future + 'static, const N: usize> TaskPool<F, N> {
     /// is an `async fn`, NOT a hand-written `Future`.
     #[doc(hidden)]
     pub unsafe fn _spawn_async_fn<FutFn>(&'static self, future: FutFn) -> SpawnToken<impl Sized>
-    where
-        FutFn: FnOnce() -> F,
+        where
+            FutFn: FnOnce() -> F,
     {
         // See the comment in AvailableTask::__initialize_async_fn for explanation.
         self.spawn_impl::<FutFn>(future)
@@ -328,7 +328,7 @@ pub(crate) struct SyncExecutor {
 impl SyncExecutor {
     pub(crate) fn new(pender: Pender) -> Self {
         #[cfg(feature = "integrated-timers")]
-        let alarm = unsafe { unwrap!(driver::allocate_alarm()) };
+            let alarm = unsafe { unwrap!(driver::allocate_alarm()) };
 
         Self {
             run_queue: RunQueue::new(),
