@@ -494,7 +494,11 @@ impl<D: Driver> Stack<D> {
 
     /// Make a query for a given name and return the corresponding IP addresses.
     #[cfg(feature = "dns")]
-    pub async fn dns_query(&self, name: &str, qtype: dns::DnsQueryType) -> Result<Vec<IpAddress, 1>, dns::Error> {
+    pub async fn dns_query(
+        &self,
+        name: &str,
+        qtype: dns::DnsQueryType,
+    ) -> Result<Vec<IpAddress, { smoltcp::config::DNS_MAX_RESULT_COUNT }>, dns::Error> {
         // For A and AAAA queries we try detect whether `name` is just an IP address
         match qtype {
             #[cfg(feature = "proto-ipv4")]
@@ -612,9 +616,11 @@ impl<D: Driver> Stack<D> {
         let addr = addr.into();
 
         self.with_mut(|s, i| {
+            let (_hardware_addr, medium) = to_smoltcp_hardware_address(i.device.hardware_address());
             let mut smoldev = DriverAdapter {
                 cx: Some(cx),
                 inner: &mut i.device,
+                medium,
             };
 
             match s
@@ -649,9 +655,11 @@ impl<D: Driver> Stack<D> {
         let addr = addr.into();
 
         self.with_mut(|s, i| {
+            let (_hardware_addr, medium) = to_smoltcp_hardware_address(i.device.hardware_address());
             let mut smoldev = DriverAdapter {
                 cx: Some(cx),
                 inner: &mut i.device,
+                medium,
             };
 
             match s

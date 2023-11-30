@@ -1,0 +1,27 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, dev]
+
+jobs:
+  deploy-doc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "true"
+      - name: build doc
+        run: |
+          cargo doc --features arch-std,executor-thread,std,nightly,turbowakers
+      - name: copy html
+        run: |
+          touch target/doc/.nojekyll
+          cp index.html target/doc/index.html
+
+      - name: Push to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/doc

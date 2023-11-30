@@ -26,20 +26,37 @@ impl Instant {
         Self { ticks }
     }
 
+    /// ## Chinese
+    ///
+    /// 创建一个从系统启动到`micros`微秒的`Insant`实例（译注：这里采用GCD_1M来减少精度损失，下同）
+    ///
+    /// ## English
+    ///
     /// Create an Instant from a microsecond count since system boot.
+    ///
     pub const fn from_micros(micros: u64) -> Self {
         Self {
             ticks: micros * (TICK_HZ / GCD_1M) / (1_000_000 / GCD_1M),
         }
     }
-
+    /// ## Chinese
+    ///
+    /// 创建一个从系统启动到`millis`毫秒的`Insant`实例（译注：这里采用GCD_1K来减少精度损失）
+    ///
+    /// ## English
+    ///
     /// Create an Instant from a millisecond count since system boot.
     pub const fn from_millis(millis: u64) -> Self {
         Self {
             ticks: millis * (TICK_HZ / GCD_1K) / (1000 / GCD_1K),
         }
     }
-
+    /// ## Chinese
+    ///
+    /// 创建一个从系统启动到`seconds`微秒的`Insant`实例（译注：这里采用GCD_1M来减少精度损失，下同）
+    ///
+    /// ## English
+    ///
     /// Create an Instant from a second count since system boot.
     pub const fn from_secs(seconds: u64) -> Self {
         Self {
