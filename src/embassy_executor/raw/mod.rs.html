@@ -893,8 +893,8 @@
     /// is an `async fn`, NOT a hand-written `Future`.
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub unsafe fn </span>_spawn_async_fn&lt;FutFn&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="self">self</span>, future: FutFn) -&gt; SpawnToken&lt;<span class="kw">impl </span>Sized&gt;
-    <span class="kw">where
-        </span>FutFn: FnOnce() -&gt; F,
+        <span class="kw">where
+            </span>FutFn: FnOnce() -&gt; F,
     {
         <span class="comment">// See the comment in AvailableTask::__initialize_async_fn for explanation.
         </span><span class="self">self</span>.spawn_impl::&lt;FutFn&gt;(future)
@@ -929,7 +929,7 @@
 <span class="kw">impl </span>SyncExecutor {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(pender: Pender) -&gt; <span class="self">Self </span>{
         <span class="attr">#[cfg(feature = <span class="string">&quot;integrated-timers&quot;</span>)]
-        </span><span class="kw">let </span>alarm = <span class="kw">unsafe </span>{ <span class="macro">unwrap!</span>(driver::allocate_alarm()) };
+            </span><span class="kw">let </span>alarm = <span class="kw">unsafe </span>{ <span class="macro">unwrap!</span>(driver::allocate_alarm()) };
 
         <span class="self">Self </span>{
             run_queue: RunQueue::new(),

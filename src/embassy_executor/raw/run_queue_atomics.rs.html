@@ -85,6 +85,37 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::ptr;
 <span class="kw">use </span>core::ptr::NonNull;
 <span class="kw">use </span>core::sync::atomic::{AtomicPtr, Ordering};
@@ -104,7 +135,18 @@
     }
 }
 
-<span class="doccomment">/// Atomic task queue using a very, very simple lock-free linked-list queue:
+<span class="doccomment">/// 原子任务队列，使用一个非常简单的无锁链表队列实现。
+///
+/// 入队任务时，task.next 指向旧队头，任务自动成为队头。
+///
+/// 出队是批量操作的：通过将队头替换为null来清空队列，然后遍历出队的任务。
+///
+/// 注意出队后遍历的顺序与入队顺序相反。这对于我们的目的来说是可接受的：这样不会产生公平性问题，
+/// 因为在当前批次完成之前，不会进行下一个批次的操作，因此，即使某个任务马上又入队（例如使用自己的唤醒器唤醒自己）
+/// 也不会阻止当前批次的任务继续运行
+///
+/// ---
+/// Atomic task queue using a very, very simple lock-free linked-list queue:
 ///
 /// To enqueue a task, task.next is set to the old head, and head is atomically set to task.
 ///
@@ -126,7 +168,14 @@
         }
     }
 
-    <span class="doccomment">/// Enqueues an item. Returns true if the queue was empty.
+    <span class="doccomment">/// 入队一个元素。若队列空，则返回 true
+    ///
+    /// # 安全的
+    ///
+    /// `item` 不能以及在任何队列中。
+    ///
+    /// ---
+    /// Enqueues an item. Returns true if the queue was empty.
     ///
     /// # Safety
     ///
@@ -139,9 +188,11 @@
             .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |prev| {
                 was_empty = prev.is_null();
                 <span class="kw">unsafe </span>{
-                    <span class="comment">// safety: the pointer is either null or valid
+                    <span class="comment">// 安全的：这个指正只能是 null 或 有效
+                    // safety: the pointer is either null or valid
                     </span><span class="kw">let </span>prev = NonNull::new(prev).map(|ptr| TaskRef::from_ptr(ptr.as_ptr()));
-                    <span class="comment">// safety: there are no concurrent accesses to `next`
+                    <span class="comment">// 安全的： 这里不存在并发访问 `next`
+                    // safety: there are no concurrent accesses to `next`
                     </span>task.header().run_queue_item.next.set(prev);
                 }
                 <span class="prelude-val">Some</span>(task.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>)
@@ -151,19 +202,30 @@
         was_empty
     }
 
-    <span class="doccomment">/// Empty the queue, then call `on_task` for each task that was in the queue.
+    <span class="doccomment">/// 清空队列，然后对原队列中的每一个任务调用 `on_task`
+    /// 注意： `on_task` 可以让更多的任务入队，在这种情况下，它们被留在队列中，然后在*下一次*调用 `dequeue_all`时
+    /// 被处理，而*不是*当前
+    ///
+    /// ---
+    /// Empty the queue, then call `on_task` for each task that was in the queue.
     /// NOTE: It is OK for `on_task` to enqueue more tasks. In this case they&#39;re left in the queue
     /// and will be processed by the *next* call to `dequeue_all`, *not* the current one.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dequeue_all(<span class="kw-2">&amp;</span><span class="self">self</span>, on_task: <span class="kw">impl </span>Fn(TaskRef)) {
-        <span class="comment">// Atomically empty the queue.
+        <span class="comment">// 自动清空队列
+        // Atomically empty the queue.
         </span><span class="kw">let </span>ptr = <span class="self">self</span>.head.swap(ptr::null_mut(), Ordering::AcqRel);
 
-        <span class="comment">// safety: the pointer is either null or valid
+        <span class="comment">// 安全的： 这个指正只能是 null 或者有效
+        // safety: the pointer is either null or valid
         </span><span class="kw">let </span><span class="kw-2">mut </span>next = <span class="kw">unsafe </span>{ NonNull::new(ptr).map(|ptr| TaskRef::from_ptr(ptr.as_ptr())) };
 
-        <span class="comment">// Iterate the linked list of tasks that were previously in the queue.
+        <span class="comment">// 便利之前在队列中的任务链表
+        // Iterate the linked list of tasks that were previously in the queue.
         </span><span class="kw">while let </span><span class="prelude-val">Some</span>(task) = next {
-            <span class="comment">// If the task re-enqueues itself, the `next` pointer will get overwritten.
+            <span class="comment">// 如果任务重新入队它自己， `next` 会被覆盖。
+            // 因此，现读取 `next` 指针，然后再处理任务。
+            // 安全的：这里不存在并发访问 `next`
+            // If the task re-enqueues itself, the `next` pointer will get overwritten.
             // Therefore, first read the next pointer, and only then process the task.
             // safety: there are no concurrent accesses to `next`
             </span>next = <span class="kw">unsafe </span>{ task.header().run_queue_item.next.get() };
