@@ -649,6 +649,13 @@ impl Executor {
         mem::transmute(inner)
     }
 
+    /// 创建一个新的执行器
+    ///
+    /// 但执行其有活要干时，他就会调用 pender 函数，并把 `context` 传给它。
+    ///
+    /// 在 [`Executor`] 的文档中可以看到 pender 的详情。
+    ///
+    /// ---
     /// Create a new executor.
     ///
     /// When the executor has work to do, it will call the pender function and pass `context` to it.
@@ -661,6 +668,17 @@ impl Executor {
         }
     }
 
+    /// 在当前执行器中创建任务
+    ///
+    /// # 安全性
+    ///
+    /// `task` 必须是一个有效的指针，必须已经初始化，但还未被分配任务。
+    ///
+    /// 在当前执行器以外的线程中，可以使用 `unsafe` 去调用这个方法。
+    /// 在这种情况下，这个任务的 Future 必须时 Send 的。这个是因为本质上是发送任务给执行器的线程。
+    ///
+    ///
+    /// ---
     /// Spawn a task in this executor.
     ///
     /// # Safety
@@ -674,6 +692,21 @@ impl Executor {
         self.inner.spawn(task)
     }
 
+    /// 拉取当前执行器队列中的所有任务
+    ///
+    /// 这个方法会遍历队列中所有待拉取的任务（如刚被创建的或被唤醒的）。其他任务不会被拉取。
+    ///
+    /// 在收到 pender 调用后，必须调用 `poll`。即使 pender 没有被调用，也可以去调用 `poll`，
+    /// 只是这样会浪费资源。。
+    ///
+    /// # 安全性
+    ///
+    /// 禁止在相同的执行器中重入的调用 `poll` 。
+    ///
+    /// 特别注意 `poll` 可能会被并发调用。因此，禁止在 pender 的回调中直接调用 `poll()`。换而言之，
+    /// 回调方法必须稍后再以某种调度方式调用 `poll()`，这时你必须确认 `poll()` 已经没有在运行。
+    ///
+    /// ---
     /// Poll all queued tasks in this executor.
     ///
     /// This loops over all tasks that are queued to be polled (i.e. they're
@@ -695,6 +728,11 @@ impl Executor {
         self.inner.poll()
     }
 
+    /// 获取一个在当前执行器中生成任务的生成器
+    ///
+    /// 可以多次调用这个方法来获取多个 `Spawner`。你也可以复制 `Spawner`。
+    ///
+    /// ---
     /// Get a spawner that spawns tasks in this executor.
     ///
     /// It is OK to call this method multiple times to obtain multiple
@@ -704,6 +742,11 @@ impl Executor {
     }
 }
 
+/// 通过 `TaskRef` 唤醒任务
+///
+/// 你可以使用 [`task_from_waker`] 来通过一个 `Waker` 得到 `TaskRef`
+///
+/// ---
 /// Wake a task by `TaskRef`.
 ///
 /// You can obtain a `TaskRef` from a `Waker` using [`task_from_waker`].
@@ -718,6 +761,11 @@ pub fn wake_task(task: TaskRef) {
     }
 }
 
+/// 通过 `TaskRef` 唤醒一个任务，但不调用 pend
+///
+/// 你可以使用 [`task_from_waker`] 来通过一个 `Waker` 得到 `TaskRef`
+///
+/// ---
 /// Wake a task by `TaskRef` without calling pend.
 ///
 /// You can obtain a `TaskRef` from a `Waker` using [`task_from_waker`].

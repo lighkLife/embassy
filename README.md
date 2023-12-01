@@ -18,24 +18,25 @@
 
 ## 翻译登记
 
-| Crate            | File                 | Translation author                        | Status | Reviser |
-|------------------|----------------------|-------------------------------------------|:-------|---------|
-| embassy-executor | `README.md`          | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-executor | `arch/std.rs`        | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-executor | `arch/riscv32.rs`    | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-executor | `lib.rs`             | [LighkLife](https://github.com/lighkLife) |        |         |
-| embassy-executor | `spawner.rs`         | [LighkLife](https://github.com/lighkLife) |        |         |
-| embassy-executor | `raw/mod.rs`         | [LighkLife](https://github.com/lighkLife) | Doing  |         |
-| embassy-executor | `raw/run_queue.rs`   | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-executor | `raw/waker_turbo.rs` | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-executor | `raw/waker.rs`       | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-futures  |  all         | [StaRainorigin](https://github.com/StaRainorigin) |  Done  |         |
-| embassy-time     |                      | [ziyouwa](https://github.com/ziyouwa)     | Doing  |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
-|                  |                      |                                           |        |         |
+| Crate            | File                       | Translation author                                | Status | Reviser |
+|------------------|----------------------------|---------------------------------------------------|:-------|---------|
+| embassy-executor | `README.md`                | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `arch/std.rs`              | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `arch/riscv32.rs`          | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `lib.rs`                   | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `spawner.rs`               | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `raw/mod.rs`               | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `raw/state_atomics.rs`     | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `raw/run_queue_atomics.rs` | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `raw/waker_turbo.rs`       | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-executor | `raw/waker.rs`             | [LighkLife](https://github.com/lighkLife)         | Done   |         |
+| embassy-futures  | all                        | [StaRainorigin](https://github.com/StaRainorigin) | Done   |         |
+| embassy-time     |                            | [ziyouwa](https://github.com/ziyouwa)             | Doing  |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
+|                  |                            |                                                   |        |         |
