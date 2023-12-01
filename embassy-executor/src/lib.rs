@@ -41,6 +41,9 @@ pub mod raw;
 mod spawner;
 pub use spawner::*;
 
+/// embassy 宏的实现细节
+/// 请勿使用。仅用于宏和 HALs。不在永久保证范围内。
+/// ---
 /// Implementation details for embassy macros.
 /// Do not use. Used for macros and HALs only. Not covered by semver guarantees.
 #[doc(hidden)]
@@ -48,6 +51,9 @@ pub mod _export {
     #[cfg(feature = "rtos-trace")]
     pub use rtos_trace::trace;
 
+    /// 使用 `embassy-executor`的 `rtos-trace-interrupt` 特性时，展开宏
+    ///
+    /// ---
     /// Expands the given block of code when `embassy-executor` is compiled with
     /// the `rtos-trace-interrupt` feature.
     #[doc(hidden)]
@@ -57,6 +63,9 @@ pub mod _export {
         ($($tt:tt)*) => { $($tt)* };
     }
 
+    /// 使用 `embassy-executor`的 `rtos-trace-interrupt` 特性时，不展开宏
+    ///
+    /// ---
     /// Does not expand the given block of code when `embassy-executor` is
     /// compiled without the `rtos-trace-interrupt` feature.
     #[doc(hidden)]
