@@ -767,6 +767,54 @@
 <a href="#767" id="767">767</a>
 <a href="#768" id="768">768</a>
 <a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
+<a href="#817" id="817">817</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! 原始执行器
 //!
 //! 这个模块暴露 &quot;原生&quot; 执行器和任务结构体，可以用作更低层次的控制。
@@ -1418,7 +1466,14 @@
         mem::transmute(inner)
     }
 
-    <span class="doccomment">/// Create a new executor.
+    <span class="doccomment">/// 创建一个新的执行器
+    ///
+    /// 但执行其有活要干时，他就会调用 pender 函数，并把 `context` 传给它。
+    ///
+    /// 在 [`Executor`] 的文档中可以看到 pender 的详情。
+    ///
+    /// ---
+    /// Create a new executor.
     ///
     /// When the executor has work to do, it will call the pender function and pass `context` to it.
     ///
@@ -1430,7 +1485,18 @@
         }
     }
 
-    <span class="doccomment">/// Spawn a task in this executor.
+    <span class="doccomment">/// 在当前执行器中创建任务
+    ///
+    /// # 安全性
+    ///
+    /// `task` 必须是一个有效的指针，必须已经初始化，但还未被分配任务。
+    ///
+    /// 在当前执行器以外的线程中，可以使用 `unsafe` 去调用这个方法。
+    /// 在这种情况下，这个任务的 Future 必须时 Send 的。这个是因为本质上是发送任务给执行器的线程。
+    ///
+    ///
+    /// ---
+    /// Spawn a task in this executor.
     ///
     /// # Safety
     ///
@@ -1443,7 +1509,22 @@
         <span class="self">self</span>.inner.spawn(task)
     }
 
-    <span class="doccomment">/// Poll all queued tasks in this executor.
+    <span class="doccomment">/// 拉取当前执行器队列中的所有任务
+    ///
+    /// 这个方法会遍历队列中所有待拉取的任务（如刚被创建的或被唤醒的）。其他任务不会被拉取。
+    ///
+    /// 在收到 pender 调用后，必须调用 `poll`。即使 pender 没有被调用，也可以去调用 `poll`，
+    /// 只是这样会浪费资源。。
+    ///
+    /// # 安全性
+    ///
+    /// 禁止在相同的执行器中重入的调用 `poll` 。
+    ///
+    /// 特别注意 `poll` 可能会被并发调用。因此，禁止在 pender 的回调中直接调用 `poll()`。换而言之，
+    /// 回调方法必须稍后再以某种调度方式调用 `poll()`，这时你必须确认 `poll()` 已经没有在运行。
+    ///
+    /// ---
+    /// Poll all queued tasks in this executor.
     ///
     /// This loops over all tasks that are queued to be polled (i.e. they&#39;re
     /// freshly spawned or they&#39;ve been woken). Other tasks are not polled.
@@ -1464,7 +1545,12 @@
         <span class="self">self</span>.inner.poll()
     }
 
-    <span class="doccomment">/// Get a spawner that spawns tasks in this executor.
+    <span class="doccomment">/// 获取一个在当前执行器中生成任务的生成器
+    ///
+    /// 可以多次调用这个方法来获取多个 `Spawner`。你也可以复制 `Spawner`。
+    ///
+    /// ---
+    /// Get a spawner that spawns tasks in this executor.
     ///
     /// It is OK to call this method multiple times to obtain multiple
     /// `Spawner`s. You may also copy `Spawner`s.
@@ -1473,7 +1559,12 @@
     }
 }
 
-<span class="doccomment">/// Wake a task by `TaskRef`.
+<span class="doccomment">/// 通过 `TaskRef` 唤醒任务
+///
+/// 你可以使用 [`task_from_waker`] 来通过一个 `Waker` 得到 `TaskRef`
+///
+/// ---
+/// Wake a task by `TaskRef`.
 ///
 /// You can obtain a `TaskRef` from a `Waker` using [`task_from_waker`].
 </span><span class="kw">pub fn </span>wake_task(task: TaskRef) {
@@ -1487,7 +1578,12 @@
     }
 }
 
-<span class="doccomment">/// Wake a task by `TaskRef` without calling pend.
+<span class="doccomment">/// 通过 `TaskRef` 唤醒一个任务，但不调用 pend
+///
+/// 你可以使用 [`task_from_waker`] 来通过一个 `Waker` 得到 `TaskRef`
+///
+/// ---
+/// Wake a task by `TaskRef` without calling pend.
 ///
 /// You can obtain a `TaskRef` from a `Waker` using [`task_from_waker`].
 </span><span class="kw">pub fn </span>wake_task_no_pend(task: TaskRef) {
