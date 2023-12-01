@@ -66,6 +66,15 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(not(any(feature = <span class="string">&quot;arch-std&quot;</span>, feature = <span class="string">&quot;arch-wasm&quot;</span>)), no_std)]
 #![cfg_attr(all(feature = <span class="string">&quot;nightly&quot;</span>, feature = <span class="string">&quot;arch-xtensa&quot;</span>), feature(asm_experimental_arch))]
 #![allow(clippy::new_without_default)]
@@ -109,14 +118,20 @@
 <span class="kw">mod </span>spawner;
 <span class="kw">pub use </span>spawner::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Implementation details for embassy macros.
+<span class="doccomment">/// embassy 宏的实现细节
+/// 请勿使用。仅用于宏和 HALs。不在永久保证范围内。
+/// ---
+/// Implementation details for embassy macros.
 /// Do not use. Used for macros and HALs only. Not covered by semver guarantees.
 </span><span class="attr">#[doc(hidden)]
 </span><span class="kw">pub mod </span>_export {
     <span class="attr">#[cfg(feature = <span class="string">&quot;rtos-trace&quot;</span>)]
     </span><span class="kw">pub use </span>rtos_trace::trace;
 
-    <span class="doccomment">/// Expands the given block of code when `embassy-executor` is compiled with
+    <span class="doccomment">/// 使用 `embassy-executor`的 `rtos-trace-interrupt` 特性时，展开宏
+    ///
+    /// ---
+    /// Expands the given block of code when `embassy-executor` is compiled with
     /// the `rtos-trace-interrupt` feature.
     </span><span class="attr">#[doc(hidden)]
     #[macro_export]
@@ -125,7 +140,10 @@
         ($(<span class="macro-nonterminal">$tt</span>:tt)<span class="kw-2">*</span>) =&gt; { $(<span class="macro-nonterminal">$tt</span>)* };
     }
 
-    <span class="doccomment">/// Does not expand the given block of code when `embassy-executor` is
+    <span class="doccomment">/// 使用 `embassy-executor`的 `rtos-trace-interrupt` 特性时，不展开宏
+    ///
+    /// ---
+    /// Does not expand the given block of code when `embassy-executor` is
     /// compiled without the `rtos-trace-interrupt` feature.
     </span><span class="attr">#[doc(hidden)]
     #[macro_export]

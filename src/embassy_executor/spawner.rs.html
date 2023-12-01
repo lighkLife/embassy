@@ -195,6 +195,92 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::future::poll_fn;
 <span class="kw">use </span>core::marker::PhantomData;
 <span class="kw">use </span>core::mem;
@@ -202,7 +288,20 @@
 
 <span class="kw">use </span><span class="kw">super</span>::raw;
 
-<span class="doccomment">/// Token to spawn a newly-created task in an executor.
+<span class="doccomment">/// 在执行器中创建新任务的令牌
+///
+/// 当调用任务方法时（比如 `#[embassy_executor::task] async fn my_task() { ... }`），
+/// 返回值是一个的 `SpawnToken`，它代表这个任务的实例。你必须将它放到一个执行器中去创建任务，如  [`Spawner::spawn()`]
+///
+/// 范型参数 `S` 决定执行器在其他线程中是否可以创建任务。如果 `S: Send`，则可以，这允许将其放到 [`SendSpawner`]来生成任务。
+/// 否则，就不可以，只能在当前线程中使用 [`Spawner`] 来生成任务。
+///
+/// # 异常
+/// 销毁一个 SpawnToken 实例会导致异常。你不该以这种方式“中止”任务的创建。
+/// 一旦你调用一个任务函数，并得到一个 SpawnToken，就 *必须* 创建它。
+///
+/// ---
+/// Token to spawn a newly-created task in an executor.
 ///
 /// When calling a task function (like `#[embassy_executor::task] async fn my_task() { ... }`), the returned
 /// value is a `SpawnToken` that represents an instance of the task, ready to spawn. You must
@@ -230,7 +329,10 @@
         }
     }
 
-    <span class="doccomment">/// Return a SpawnToken that represents a failed spawn.
+    <span class="doccomment">/// 返回一个 SpawnToken， 代表创建任务失败
+    ///
+    /// ---
+    /// Return a SpawnToken that represents a failed spawn.
     </span><span class="kw">pub fn </span>new_failed() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             raw_task: <span class="prelude-val">None</span>,
@@ -246,11 +348,21 @@
     }
 }
 
-<span class="doccomment">/// Error returned when spawning a task.
+<span class="doccomment">/// 创建任务时返回的错误
+///
+/// ---
+/// Error returned when spawning a task.
 </span><span class="attr">#[derive(Copy, Clone, Debug)]
 #[cfg_attr(feature = <span class="string">&quot;defmt&quot;</span>, derive(defmt::Format))]
 </span><span class="kw">pub enum </span>SpawnError {
-    <span class="doccomment">/// Too many instances of this task are already running.
+    <span class="doccomment">/// 此任务正在运行的实例太多。
+    ///
+    /// 默认情况下，一个被 `#[embassy_executor::task]` 标记的任务，在运行期间，只能有一个实例。
+    /// 你可以使用 `#[embassy_executor::task(pool_size = 4)]` 来让多个实例并行运行，这也会
+    /// 消耗更多的内存。
+    ///
+    /// ---
+    /// Too many instances of this task are already running.
     ///
     /// By default, a task marked with `#[embassy_executor::task]` can only have one instance
     /// running at a time. You may allow multiple instances to run in parallel with
@@ -258,7 +370,14 @@
     </span>Busy,
 }
 
-<span class="doccomment">/// Handle to spawn tasks into an executor.
+<span class="doccomment">/// 生成任务到执行器中的句柄
+///
+/// 这个生成器可以生成任何任务（无论任务是否 Send），但是它只能在它执行器所在的线程中使用（它自己本身非 Send）
+///
+/// 如果你想在另一个线程中生成任务，请使用 [SendSpawner]。
+///
+/// ---
+/// Handle to spawn tasks into an executor.
 ///
 /// This Spawner can spawn any task (Send and non-Send ones), but it can
 /// only be used in the executor thread (it is not Send itself).
@@ -278,7 +397,15 @@
         }
     }
 
-    <span class="doccomment">/// Get a Spawner for the current executor.
+    <span class="doccomment">/// 从当前执行器中获取生成器
+    ///
+    /// 这个函数是 `async` 的，仅是为了访问当前异步上下文。它会立即返回，不会阻塞。
+    ///
+    /// #异常
+    /// 如果当前执行器不是的 Embassy 执行器就会发生异常。
+    ///
+    /// ---
+    /// Get a Spawner for the current executor.
     ///
     /// This function is `async` just to get access to the current async
     /// context. It returns instantly, it does not block/yield.
@@ -296,7 +423,12 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Spawn a task into an executor.
+    <span class="doccomment">/// 创建一个任务到执行器中
+    ///
+    /// 你可以调用任务函数来获取`token`（比如一个被`#[embassy_executor::task]`标记的函数）
+    ///
+    /// ---
+    /// Spawn a task into an executor.
     ///
     /// You obtain the `token` by calling a task function (i.e. one marked with `#[embassy_executor::task]`).
     </span><span class="kw">pub fn </span>spawn&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, token: SpawnToken&lt;S&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), SpawnError&gt; {
@@ -312,7 +444,16 @@
         }
     }
 
-    <span class="comment">// Used by the `embassy_macros::main!` macro to throw an error when spawn
+    <span class="comment">// 被 `embassy_macros::main!` 宏使用，创建任务失败时抛出一个错误。
+    // 这里允许有条件地使用 `defmt::unwrap!` 没有在 `embassy_macros`
+    // 包中引入 `defmt` 特性，就需要使用 `-Z namespaced-features`。
+    </span><span class="doccomment">/// 创建一个任务到执行器中，失败时会发生异常。
+    ///
+    /// # 异常
+    /// 如果创建失败就会异常
+    ///
+    /// ---
+    </span><span class="comment">// Used by the `embassy_macros::main!` macro to throw an error when spawn
     // fails. This is here to allow conditional use of `defmt::unwrap!`
     // without introducing a `defmt` feature in the `embassy_macros` package,
     // which would require use of `-Z namespaced-features`.
@@ -325,7 +466,11 @@
         <span class="macro">unwrap!</span>(<span class="self">self</span>.spawn(token));
     }
 
-    <span class="doccomment">/// Convert this Spawner to a SendSpawner. This allows you to send the
+    <span class="doccomment">/// 将当前 Spawner 转换为 SendSpawner。这样就可以将生成器发送到其他线程，
+    /// 但是这个 spawner 会就只能生成 Send 的任务。
+    ///
+    /// ---
+    /// Convert this Spawner to a SendSpawner. This allows you to send the
     /// spawner to other threads, but the spawner loses the ability to spawn
     /// non-Send tasks.
     </span><span class="kw">pub fn </span>make_send(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SendSpawner {
@@ -333,7 +478,15 @@
     }
 }
 
-<span class="doccomment">/// Handle to spawn tasks into an executor from any thread.
+<span class="doccomment">/// 在任意线程中，生成任务到执行器中的句柄
+///
+/// 这个生成器可以被任意现场使用（它是 Send 的），但是它只能创建 Send 的任务。
+/// 这是因为生成器本质上是将任务 “发送” 给执行器的线程。
+///
+/// 如果你线创建 non-Send 的任务，请使用 [Spawner].
+///
+/// ---
+/// Handle to spawn tasks into an executor from any thread.
 ///
 /// This Spawner can be used from any thread (it is Send), but it can
 /// only spawn Send tasks. The reason for this is spawning is effectively
@@ -350,7 +503,15 @@
         <span class="self">Self </span>{ executor }
     }
 
-    <span class="doccomment">/// Get a Spawner for the current executor.
+    <span class="doccomment">/// 从当前执行器中获取生成器
+    ///
+    /// 这个函数是 `async` 的，仅是为了访问当前异步上下文。它会立即返回，不会阻塞。
+    ///
+    /// #异常
+    /// 如果当前执行器不是的 Embassy 执行器就会发生异常。
+    ///
+    /// ---
+    /// Get a Spawner for the current executor.
     ///
     /// This function is `async` just to get access to the current async
     /// context. It returns instantly, it does not block/yield.
@@ -367,7 +528,12 @@
         .<span class="kw">await
     </span>}
 
-    <span class="doccomment">/// Spawn a task into an executor.
+    <span class="doccomment">/// 创建一个任务到执行器中
+    ///
+    /// 你可以调用任务函数来获取`token`（比如一个被`#[embassy_executor::task]`标记的函数）
+    ///
+    /// ---
+    /// Spawn a task into an executor.
     ///
     /// You obtain the `token` by calling a task function (i.e. one marked with `#[embassy_executor::task]`).
     </span><span class="kw">pub fn </span>spawn&lt;S: Send&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, token: SpawnToken&lt;S&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), SpawnError&gt; {
@@ -383,7 +549,13 @@
         }
     }
 
-    <span class="doccomment">/// Spawn a task into an executor, panicking on failure.
+    <span class="doccomment">/// 创建一个任务到执行器中，失败时会发生异常。
+    ///
+    /// # 异常
+    /// 如果创建失败就会异常
+    ///
+    /// ---
+    /// Spawn a task into an executor, panicking on failure.
     ///
     /// # Panics
     ///

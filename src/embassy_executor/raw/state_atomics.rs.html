@@ -71,13 +71,37 @@
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::sync::atomic::{AtomicU32, Ordering};
 
-<span class="doccomment">/// Task is spawned (has a future)
+<span class="doccomment">/// 任务被创建（拥有一个 future）
+///
+/// ---
+/// Task is spawned (has a future)
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>STATE_SPAWNED: u32 = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
-<span class="doccomment">/// Task is in the executor run queue
+<span class="doccomment">/// 任务在执行器的运行队列中
+///
+/// ---
+/// Task is in the executor run queue
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>STATE_RUN_QUEUED: u32 = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
-<span class="doccomment">/// Task is in the executor timer queue
+<span class="doccomment">/// 任务在执行器的时间队列中
+///
+/// ---
+/// Task is in the executor timer queue
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;integrated-timers&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>STATE_TIMER_QUEUED: u32 = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
 
@@ -92,7 +116,8 @@
         }
     }
 
-    <span class="doccomment">/// If task is idle, mark it as spawned + run_queued and return true.
+    <span class="doccomment">/// 如果任务空闲，将其标记为 spawned + run_queued，再返回
+    /// If task is idle, mark it as spawned + run_queued and return true.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.state
@@ -100,13 +125,15 @@
             .is_ok()
     }
 
-    <span class="doccomment">/// Unmark the task as spawned.
+    <span class="doccomment">/// 取消任务的 spawned 标记
+    /// Unmark the task as spawned.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>despawn(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.state.fetch_and(!STATE_SPAWNED, Ordering::AcqRel);
     }
 
-    <span class="doccomment">/// Mark the task as run-queued if it&#39;s spawned and isn&#39;t already run-queued. Return true on success.
+    <span class="doccomment">/// 如果任务已经被创建，并且没有在运行队列中，将其标记为 run-queued。如果成功，返回 true
+    /// Mark the task as run-queued if it&#39;s spawned and isn&#39;t already run-queued. Return true on success.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>run_enqueue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.state
@@ -122,14 +149,16 @@
             .is_ok()
     }
 
-    <span class="doccomment">/// Unmark the task as run-queued. Return whether the task is spawned.
+    <span class="doccomment">/// 取消任务的 run-queued 标记，返回任务是否被创建
+    /// Unmark the task as run-queued. Return whether the task is spawned.
     </span><span class="attr">#[inline(always)]
     </span><span class="kw">pub fn </span>run_dequeue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="kw">let </span>state = <span class="self">self</span>.state.fetch_and(!STATE_RUN_QUEUED, Ordering::AcqRel);
         state &amp; STATE_SPAWNED != <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Mark the task as timer-queued. Return whether it was newly queued (i.e. not queued before)
+    <span class="doccomment">/// 将任务标记为 timer-queued。返回任务是否新入队（之前没有入队过）
+    /// Mark the task as timer-queued. Return whether it was newly queued (i.e. not queued before)
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;integrated-timers&quot;</span>)]
     #[inline(always)]
     </span><span class="kw">pub fn </span>timer_enqueue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
@@ -137,7 +166,8 @@
         old_state &amp; STATE_TIMER_QUEUED == <span class="number">0
     </span>}
 
-    <span class="doccomment">/// Unmark the task as timer-queued.
+    <span class="doccomment">/// 取消任务的 timer-queued 标记
+    /// Unmark the task as timer-queued.
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;integrated-timers&quot;</span>)]
     #[inline(always)]
     </span><span class="kw">pub fn </span>timer_dequeue(<span class="kw-2">&amp;</span><span class="self">self</span>) {

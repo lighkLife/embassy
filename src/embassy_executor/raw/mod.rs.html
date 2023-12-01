@@ -599,7 +599,184 @@
 <a href="#599" id="599">599</a>
 <a href="#600" id="600">600</a>
 <a href="#601" id="601">601</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Raw executor.
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
+<a href="#641" id="641">641</a>
+<a href="#642" id="642">642</a>
+<a href="#643" id="643">643</a>
+<a href="#644" id="644">644</a>
+<a href="#645" id="645">645</a>
+<a href="#646" id="646">646</a>
+<a href="#647" id="647">647</a>
+<a href="#648" id="648">648</a>
+<a href="#649" id="649">649</a>
+<a href="#650" id="650">650</a>
+<a href="#651" id="651">651</a>
+<a href="#652" id="652">652</a>
+<a href="#653" id="653">653</a>
+<a href="#654" id="654">654</a>
+<a href="#655" id="655">655</a>
+<a href="#656" id="656">656</a>
+<a href="#657" id="657">657</a>
+<a href="#658" id="658">658</a>
+<a href="#659" id="659">659</a>
+<a href="#660" id="660">660</a>
+<a href="#661" id="661">661</a>
+<a href="#662" id="662">662</a>
+<a href="#663" id="663">663</a>
+<a href="#664" id="664">664</a>
+<a href="#665" id="665">665</a>
+<a href="#666" id="666">666</a>
+<a href="#667" id="667">667</a>
+<a href="#668" id="668">668</a>
+<a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
+<a href="#673" id="673">673</a>
+<a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! 原始执行器
+//!
+//! 这个模块暴露 &quot;原生&quot; 执行器和任务结构体，可以用作更低层次的控制。
+//!
+//! ## 警告： 这里有危险
+//! 使用这个模块需要尊重微妙的安全契约。更推荐使用[executor wrappers](crate::Executor)和
+//! [`embassy_executor::task`](embassy_macros::task)宏，这些都是安全的。
+//!
+//! ---
+//! Raw executor.
 //!
 //! This module exposes &quot;raw&quot; Executor and Task structs for more low level control.
 //!
@@ -643,7 +820,10 @@
 <span class="kw">pub use </span><span class="self">self</span>::waker::task_from_waker;
 <span class="kw">use </span><span class="kw">super</span>::SpawnToken;
 
-<span class="doccomment">/// Raw task header for use in task pointers.
+<span class="doccomment">/// 任务指针指向的原始任务头
+///
+/// ---
+/// Raw task header for use in task pointers.
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TaskHeader {
     <span class="kw">pub</span>(<span class="kw">crate</span>) state: State,
     <span class="kw">pub</span>(<span class="kw">crate</span>) run_queue_item: RunQueueItem,
@@ -656,7 +836,10 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) timer_queue_item: timer_queue::TimerQueueItem,
 }
 
-<span class="doccomment">/// This is essentially a `&amp;&#39;static TaskStorage&lt;F&gt;` where the type of the future has been erased.
+<span class="doccomment">/// 这本质上是一个 `&amp;&#39;static TaskStorage&lt;F&gt;`，其中 Future 的类型已被擦除
+///
+/// ---
+/// This is essentially a `&amp;&#39;static TaskStorage&lt;F&gt;` where the type of the future has been erased.
 </span><span class="attr">#[derive(Clone, Copy)]
 </span><span class="kw">pub struct </span>TaskRef {
     ptr: NonNull&lt;TaskHeader&gt;,
@@ -672,7 +855,10 @@
         }
     }
 
-    <span class="doccomment">/// Safety: The pointer must have been obtained with `Task::as_ptr`
+    <span class="doccomment">/// 安全性： 这个指针必须已经通过 `Task::as_ptr`来获取
+    ///
+    /// ---
+    /// Safety: The pointer must have been obtained with `Task::as_ptr`
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_ptr(ptr: <span class="kw-2">*const </span>TaskHeader) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             ptr: NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>TaskHeader),
@@ -683,13 +869,34 @@
         <span class="kw">unsafe </span>{ <span class="self">self</span>.ptr.as_ref() }
     }
 
-    <span class="doccomment">/// The returned pointer is valid for the entire TaskStorage.
+    <span class="doccomment">/// 返回的指针对于整个 TaskStorage 都是有效的
+    ///
+    /// ---
+    /// The returned pointer is valid for the entire TaskStorage.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_ptr(<span class="self">self</span>) -&gt; <span class="kw-2">*const </span>TaskHeader {
         <span class="self">self</span>.ptr.as_ptr()
     }
 }
 
-<span class="doccomment">/// Raw storage in which a task can be spawned.
+<span class="doccomment">///
+/// 可以生成任务的原始存储器
+/// Raw storage in which a task can be spawned.
+///
+/// 这个结构体拥有生成一个 future 为 `F` 的任务所需的内存。
+/// 在给定的时间，`TaskStorage` 可能处于已生成或未生成状态。
+/// 你///可以使用 [`TaskStorage::spawn()`] 来生成它，如果它已经被生成，那么这个方法将会失败。
+///
+/// `TaskStorage` 必须一直存活，即使任务已经结束运行，它仍然不会被释放。因此，相关的方法需要 `&amp;&#39;static self`。
+/// 但是，它可以被重用。
+///
+/// [embassy_executor::task](embassy_macros::task) 宏内部会分配一个 `TaskStorage` 类型的静态数组。
+/// 使用原始 `Task` 的最常见原因是控制在哪里给任务非配内存：在栈上，或者在堆上，例如使用 `Box::leak` 等。
+///
+/// 需要使用 repr(C) 来保证任务在结构体的内存布局中，偏移量为 0
+/// 这使得 TaskHeader 和 TaskStorage 指针互相转换是安全的。
+///
+/// ---
+/// Raw storage in which a task can be spawned.
 ///
 /// This struct holds the necessary memory to spawn one task whose future is `F`.
 /// At a given time, the `TaskStorage` may be in spawned or not-spawned state. You
@@ -713,7 +920,10 @@
 <span class="kw">impl</span>&lt;F: Future + <span class="lifetime">&#39;static</span>&gt; TaskStorage&lt;F&gt; {
     <span class="kw">const </span>NEW: <span class="self">Self </span>= <span class="self">Self</span>::new();
 
-    <span class="doccomment">/// Create a new TaskStorage, in not-spawned state.
+    <span class="doccomment">/// 创建一个新的任务存储器，处于未创建的状态
+    ///
+    /// ---
+    /// Create a new TaskStorage, in not-spawned state.
     </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             raw: TaskHeader {
@@ -732,7 +942,25 @@
         }
     }
 
-    <span class="doccomment">/// Try to spawn the task.
+    <span class="doccomment">/// 尝试创建任务
+    ///
+    /// `future` 闭包用来构造 future。 可以生成任务的情况下，它才被调用。它是一个闭包，
+    /// 而不是简单的 `future: F` 参数，用来确保在适当的位置构造 future，多亏 NRVO 优化，
+    /// 避免了在栈上的临时复制。
+    ///
+    /// 如果人物已经被创建，并且还没有运行结束，这个方法会失败。在这种情况下，这个错误会被推迟：
+    /// 返回一个空的 SpawnToken，从而导致调用 [`Spawner::spawn()`](super::Spawner::spawn)
+    /// 返回错误。
+    ///
+    /// 一旦任务已经运行结束，你可以再一次创建它。允许在另一个不同的执行器中创建它。
+    ///
+    /// NRVO优化，即命名返回值优化（Named Return Value Optimization），是Visual C++2005及之后版本支持的一种优化技术。
+    /// 当一个函数的返回值是一个对象时，正常的返回语句的执行过程是将这个对象从当前函数的局部作用域拷贝到返回区，以便调用者可以访问。
+    /// 然而，如果所有的返回语句都返回同一个对象，NRVO优化的作用是在这个对象建立的时候直接在返回区建立，
+    /// 从而避免了函数返回时调用拷贝构造函数的需要，减少了对象的创建与销毁过程。
+    ///
+    /// ---
+    /// Try to spawn the task.
     ///
     /// The `future` closure constructs the future. It&#39;s only called if spawning is
     /// actually possible. It is a closure instead of a simple `future: F` param to ensure
@@ -770,7 +998,8 @@
             Poll::Pending =&gt; {}
         }
 
-        <span class="comment">// the compiler is emitting a virtual call for waker drop, but we know
+        <span class="comment">// 编译器会调用 waker 的 drop 方法，不过对我们的 waker 来说，这是一个空操作（drop里面没有任何操作）
+        // the compiler is emitting a virtual call for waker drop, but we know
         // it&#39;s a noop for our waker.
         </span>mem::forget(waker);
     }
@@ -784,13 +1013,21 @@
     }
 }
 
-<span class="doccomment">/// An uninitialized [`TaskStorage`].
+<span class="doccomment">/// 一个未初始化的 [`TaskStorage`].
+///
+/// ---
+/// An uninitialized [`TaskStorage`].
 </span><span class="kw">pub struct </span>AvailableTask&lt;F: Future + <span class="lifetime">&#39;static</span>&gt; {
     task: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>TaskStorage&lt;F&gt;,
 }
 
 <span class="kw">impl</span>&lt;F: Future + <span class="lifetime">&#39;static</span>&gt; AvailableTask&lt;F&gt; {
-    <span class="doccomment">/// Try to claim a [`TaskStorage`].
+    <span class="doccomment">/// 尝试申请一个 [`TaskStorage`].
+    ///
+    /// 如果任务以及被创建，并且没有运行结束，这个方法会返回 `None`
+    ///
+    /// ---
+    /// Try to claim a [`TaskStorage`].
     ///
     /// This function returns `None` if a task has already been spawned and has not finished running.
     </span><span class="kw">pub fn </span>claim(task: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>TaskStorage&lt;F&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
@@ -808,12 +1045,24 @@
         }
     }
 
-    <span class="doccomment">/// Initialize the [`TaskStorage`] to run the given future.
+    <span class="doccomment">/// 初始化 [`TaskStorage`] 来运行给定的 future。
+    ///
+    /// ---
+    /// Initialize the [`TaskStorage`] to run the given future.
     </span><span class="kw">pub fn </span>initialize(<span class="self">self</span>, future: <span class="kw">impl </span>FnOnce() -&gt; F) -&gt; SpawnToken&lt;F&gt; {
         <span class="self">self</span>.initialize_impl::&lt;F&gt;(future)
     }
 
-    <span class="doccomment">/// Initialize the [`TaskStorage`] to run the given future.
+    <span class="doccomment">/// 初始化 [`TaskStorage`] 来运行给定的 future。
+    ///
+    /// # 安全性
+    ///
+    /// `future` 必须是 `move || my_async_fn(args)` 形式的闭包，`my_async_fn` 是一个 `async fn`，
+    /// 不是一个手写的 `Future`。
+    ///
+    ///
+    /// ---
+    /// Initialize the [`TaskStorage`] to run the given future.
     ///
     /// # Safety
     ///
@@ -821,7 +1070,17 @@
     /// is an `async fn`, NOT a hand-written `Future`.
     </span><span class="attr">#[doc(hidden)]
     </span><span class="kw">pub unsafe fn </span>__initialize_async_fn&lt;FutFn&gt;(<span class="self">self</span>, future: <span class="kw">impl </span>FnOnce() -&gt; F) -&gt; SpawnToken&lt;FutFn&gt; {
-        <span class="comment">// When send-spawning a task, we construct the future in this thread, and effectively
+        <span class="comment">// 但使用 send-spawning 生成任务时，我们在该线程中构建标future，通过将其放入队列，将其发送到执行器线程。因此，理论上，
+        // send-spawning 需要 future 的 `F` 是 `Send` 的。
+        //
+        // 问题是这比实际所需的限制更严格。一旦 future 开始执行，它永远不会被发送到另一个线程中。它只会在生成时被发送。
+        // 只要任务的参数是 Send 的就足够了。（实际上，很容易意外地让你的 future 变为非 Send 的， 比如在 `.await` 之间
+        // 使用一个 `Rc` 或 `&amp;RefCell`）
+        //
+        // 在第一次 poll 中
+        //
+        // ---
+        // When send-spawning a task, we construct the future in this thread, and effectively
         // &quot;send&quot; it to the executor thread by enqueuing it in its queue. Therefore, in theory,
         // send-spawning should require the future `F` to be `Send`.
         //
@@ -850,7 +1109,12 @@
     }
 }
 
-<span class="doccomment">/// Raw storage that can hold up to N tasks of the same type.
+<span class="doccomment">/// 原始存储器，可以保存多个相同类型的任务
+///
+/// 这本质上是一个 `[TaskStorage&lt;F&gt;; N]`
+///
+/// ---
+/// Raw storage that can hold up to N tasks of the same type.
 ///
 /// This is essentially a `[TaskStorage&lt;F&gt;; N]`.
 </span><span class="kw">pub struct </span>TaskPool&lt;F: Future + <span class="lifetime">&#39;static</span>, <span class="kw">const </span>N: usize&gt; {
@@ -858,7 +1122,10 @@
 }
 
 <span class="kw">impl</span>&lt;F: Future + <span class="lifetime">&#39;static</span>, <span class="kw">const </span>N: usize&gt; TaskPool&lt;F, N&gt; {
-    <span class="doccomment">/// Create a new TaskPool, with all tasks in non-spawned state.
+    <span class="doccomment">/// 创建一个 TaskPool， 其中的所有任务都是未创建的状态
+    ///
+    /// ---
+    /// Create a new TaskPool, with all tasks in non-spawned state.
     </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             pool: [TaskStorage::NEW; N],
@@ -872,7 +1139,15 @@
         }
     }
 
-    <span class="doccomment">/// Try to spawn a task in the pool.
+    <span class="doccomment">/// 尝试在池中创建任务
+    ///
+    /// 在 [`TaskStorage::spawn()`] 可以看到详情
+    ///
+    /// 这个方法会遍历池，并且在第一个空闲的存储位置创建任务。如果没有空闲的，就会返回一个空的 SpawnToken，
+    /// 空的 SpawnToken 会导致 [`Spawner::spawn()`](super::Spawner::spawn) 返回错误。
+    ///
+    /// ---
+    /// Try to spawn a task in the pool.
     ///
     /// See [`TaskStorage::spawn()`] for details.
     ///
@@ -883,7 +1158,15 @@
         <span class="self">self</span>.spawn_impl::&lt;F&gt;(future)
     }
 
-    <span class="doccomment">/// Like spawn(), but allows the task to be send-spawned if the args are Send even if
+    <span class="doccomment">/// 类似 spawn()，但是，如果参数是 Send 的，即使 future 不是 Send 的，允许任务被 send-spawned。
+    ///
+    /// 不被 semver 保证范围，不要直接调用它。仅打算被 embassy 宏使用。
+    ///
+    /// 安全性： `future` 必须是 `move || my_async_fn(args)` 形式的闭包，`my_async_fn` 是一个 `async fn`，
+    /// 不是一个手写的 `Future`。
+    ///
+    /// ---
+    /// Like spawn(), but allows the task to be send-spawned if the args are Send even if
     /// the future is !Send.
     ///
     /// Not covered by semver guarantees. DO NOT call this directly. Intended to be used
@@ -942,7 +1225,16 @@
         }
     }
 
-    <span class="doccomment">/// Enqueue a task in the task queue
+    <span class="doccomment">/// 向任务队列中入队一个任务
+    ///
+    /// # 安全性
+    /// - `task` 必须有一个有效的指针，用来创建任务。
+    /// - `task` 必须设置为在此执行器中运行。
+    /// - `task` 不能已经入队(在这个执行器或另一个执行器中)
+    ///
+    ///
+    /// ---
+    /// Enqueue a task in the task queue
     ///
     /// # Safety
     /// - `task` must be a valid pointer to a spawned task.
@@ -973,7 +1265,12 @@
         <span class="self">self</span>.enqueue(task);
     }
 
-    <span class="doccomment">/// # Safety
+    <span class="doccomment">/// # 安全性：
+    ///
+    /// 与  [`Executor::poll`] 相同，只能在创建这个执行器的线程上调用它
+    ///
+    ///
+    /// # Safety
     ///
     /// Same as [`Executor::poll`], plus you must only call this on the thread this executor was created.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>poll(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="self">self</span>) {
@@ -992,7 +1289,14 @@
                 </span>task.expires_at.set(Instant::MAX);
 
                 <span class="kw">if </span>!task.state.run_dequeue() {
-                    <span class="comment">// If task is not running, ignore it. This can happen in the following scenario:
+                    <span class="comment">// 如果任务不是在运行中，忽视它。这可能发生在如下的场景中：
+                    //  - 任务被出队，开始 poll
+                    //  - 当任务被 poll 时，它被唤醒。 它被放在队列中。
+                    //  - 任务 poll 结束，返回  done=true
+                    //  - RUNNING 位被清除，但是任务仍在队列
+                    //
+                    // ---
+                    // If task is not running, ignore it. This can happen in the following scenario:
                     //   - Task gets dequeued, poll starts
                     //   - While task is being polled, it gets woken. It gets placed in the queue.
                     //   - Task poll finishes, returning done=true
@@ -1016,7 +1320,10 @@
 
             <span class="attr">#[cfg(feature = <span class="string">&quot;integrated-timers&quot;</span>)]
             </span>{
-                <span class="comment">// If this is already in the past, set_alarm might return false
+                <span class="comment">// 如果设置的时间是过去时间，则 set alarm 可能返回 false
+                // 在这种情况下，执行另一个轮询循环迭代。
+                // ---
+                // If this is already in the past, set_alarm might return false
                 // In that case do another poll loop iteration.
                 </span><span class="kw">let </span>next_expiration = <span class="self">self</span>.timer_queue.next_expiration();
                 <span class="kw">if </span>driver::set_alarm(<span class="self">self</span>.alarm, next_expiration.as_ticks()) {
@@ -1035,7 +1342,36 @@
     }
 }
 
-<span class="doccomment">/// Raw executor.
+<span class="doccomment">/// 原始执行器
+///
+/// 这是 Embassy 执行器的核心。它是底层的需要手动处理唤醒和任务执行。更推荐使用 [上层执行器](crate::Executor)
+///
+/// 原始执行器将唤醒和调度留给你去处理：
+///
+/// - 为了让执行器工作，调用 `poll()`。这会运行队列中的所有任务（所有“想运行”的任务）。
+/// - 如下所示，你必须提供一个 pender 函数。执行器会通知你有工作可以做了。你必须尽可能快的调用你的`poll()`。
+/// - 启用 `arch-xx` 特性会为你定义一个 pender 函数。这意味着你只能使用架构/平台为你实现的执行器。
+///   如果你有一个不同的执行器，你就不能启用 `arch-xx`特性。
+///
+/// pender 可以在*任何*上下文中被调用： 任何线程，任何中断优先级。它也可能被任何执行器的方法同时调用，
+/// 你必须正确的处理这些情况。
+///
+/// 特别说明，你不能在 pender 的回调中直接调用 `poll`，因为这违反了 `poll` 不能被重入调用的要求。
+///
+/// pender 函数被暴露的名称必须为  `__pender` ，并且需要如下的签名：
+///
+/// ```rust
+/// #[export_name = &quot;__pender&quot;]
+/// fn pender(context: *mut ()) {
+///    // schedule `poll()` to be called
+/// }
+/// ```
+///
+/// `context` 参数是执行器将传递给 pender 的任意数据。你可以在调用 [`Executor::new()`] 时设置 `context`。
+/// 例如，你可以使用它来区分执行器，也可以传一个回调指针。
+///
+/// ---
+/// Raw executor.
 ///
 /// This is the core of the Embassy executor. It is low-level, requiring manual
 /// handling of wakeups and task polling. If you can, prefer using one of the
