@@ -29,7 +29,7 @@
 | embassy-executor | `raw/run_queue.rs`   | [LighkLife](https://github.com/lighkLife) | Done   |         |
 | embassy-executor | `raw/waker_turbo.rs` | [LighkLife](https://github.com/lighkLife) | Done   |         |
 | embassy-executor | `raw/waker.rs`       | [LighkLife](https://github.com/lighkLife) | Done   |         |
-| embassy-futures  |                      |                                           |        |         |
+| embassy-futures  |  all         | [StaRainorigin](https://github.com/StaRainorigin) |  Done  |         |
 | embassy-time     |                      | [ziyouwa](https://github.com/ziyouwa)     | Doing  |         |
 |                  |                      |                                           |        |         |
 |                  |                      |                                           |        |         |
